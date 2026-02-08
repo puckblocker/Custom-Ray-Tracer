@@ -27,7 +27,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "f:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build"
+			"value" : "d:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -431,7 +431,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/pkgRedirects"
+			"value" : "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -491,7 +491,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer"
+			"value" : "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1131,7 +1131,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build"
+			"value" : "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build"
 		},
 		{
 			"name" : "ray_tracer_IS_TOP_LEVEL",
@@ -1155,7 +1155,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer"
+			"value" : "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer"
 		}
 	],
 	"kind" : "cache",

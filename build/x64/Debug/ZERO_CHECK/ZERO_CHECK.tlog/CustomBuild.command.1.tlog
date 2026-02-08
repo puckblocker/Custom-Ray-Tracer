@@ -1,6 +1,6 @@
-^F:\HOCKE\ADVANCEDGRAPHICS\CUSTOM-RAY-TRACER\BUILD\CMAKEFILES\232CA11E2BFF7C1E2BAD4228F31C84EA\GENERATE.STAMP.RULE
+^D:\HOCKE\ADVANCEDGRAPHICS\CUSTOM-RAY-TRACER\BUILD\CMAKEFILES\5C01893923947F94D0B4662BCE8BDC91\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SF:/hocke/AdvancedGraphics/Custom-Ray-Tracer -BF:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/ray_tracer.sln
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/hocke/AdvancedGraphics/Custom-Ray-Tracer -BD:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/ray_tracer.sln
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

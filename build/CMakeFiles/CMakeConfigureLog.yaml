@@ -24,9 +24,9 @@ events:
       The output was:
       0
       MSBuild version 17.14.23+b0019275e for .NET Framework
-      Build started 2/8/2026 2:09:30 PM.
+      Build started 2/8/2026 2:20:46 PM.
       
-      Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
+      Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
@@ -42,13 +42,13 @@ events:
         CMakeCCompilerId.c
       Link:
         C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
-        CompilerIdC.vcxproj -> F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe
+        CompilerIdC.vcxproj -> D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe
       AppLocalFromInstalled:
-        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"
         'pwsh.exe' is not recognized as an internal or external command,
         operable program or batch file.
-        The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"" exited with code 9009.
-        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+        The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"" exited with code 9009.
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdC.tlog\\CompilerIdC.write.1u.tlog" "Debug\\vcpkg.applocal.log"
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
         :VCEnd
@@ -56,13 +56,13 @@ events:
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate".
-      Done Building Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
+      Done Building Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.95
+      Time Elapsed 00:00:01.92
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -70,7 +70,7 @@ events:
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
       
       The C compiler identification is MSVC, found in:
-        F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/3.31.6-msvc6/CompilerIdC/CompilerIdC.exe
+        D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/3.31.6-msvc6/CompilerIdC/CompilerIdC.exe
       
   -
     kind: "message-v1"
@@ -88,9 +88,9 @@ events:
       The output was:
       0
       MSBuild version 17.14.23+b0019275e for .NET Framework
-      Build started 2/8/2026 2:09:32 PM.
+      Build started 2/8/2026 2:20:49 PM.
       
-      Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
@@ -106,13 +106,13 @@ events:
         CMakeCXXCompilerId.cpp
       Link:
         C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
-        CompilerIdCXX.vcxproj -> F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe
+        CompilerIdCXX.vcxproj -> D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe
       AppLocalFromInstalled:
-        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+        pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"
         'pwsh.exe' is not recognized as an internal or external command,
         operable program or batch file.
-        The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"" exited with code 9009.
-        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"
+        The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"" exited with code 9009.
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\bin" "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.write.1u.tlog" "Debug\\vcpkg.applocal.log"
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
         :VCEnd
@@ -120,13 +120,13 @@ events:
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
-      Done Building Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      Done Building Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.60
+      Time Elapsed 00:00:01.75
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -134,7 +134,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
       
       The CXX compiler identification is MSVC, found in:
-        F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
+        D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
       
   -
     kind: "try_compile-v1"
@@ -145,8 +145,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-h95o4o"
-      binary: "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-h95o4o"
+      source: "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-61ctzc"
+      binary: "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-61ctzc"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -155,49 +155,49 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-h95o4o'
+        Change Dir: 'D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-61ctzc'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_f41dd.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_25288.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 2/8/2026 2:09:34 PM.
+        Build started 2/8/2026 2:20:51 PM.
         
-        Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\cmTC_f41dd.vcxproj" on node 1 (default targets).
+        Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\cmTC_25288.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_f41dd.dir\\Debug\\".
+          Creating directory "cmTC_25288.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\".
-          Creating directory "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\".
+          Creating directory "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\".
+          Creating directory "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\unsuccessfulbuild".
+          Creating "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "F:\\hocke\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Debug"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\CL.exe /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_f41dd.dir\\Debug\\\\" /Fd"cmTC_f41dd.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\CL.exe /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_25288.dir\\Debug\\\\" /Fd"cmTC_25288.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.38.33145 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_f41dd.dir\\Debug\\\\" /Fd"cmTC_f41dd.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
+          cl /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_25288.dir\\Debug\\\\" /Fd"cmTC_25288.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\cmTC_f41dd.exe" /INCREMENTAL /ILK:"cmTC_f41dd.dir\\Debug\\cmTC_f41dd.ilk" /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-h95o4o/Debug/cmTC_f41dd.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-h95o4o/Debug/cmTC_f41dd.lib" /MACHINE:X64  /machine:x64 cmTC_f41dd.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_f41dd.vcxproj -> F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\cmTC_f41dd.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\cmTC_25288.exe" /INCREMENTAL /ILK:"cmTC_25288.dir\\Debug\\cmTC_25288.ilk" /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-61ctzc/Debug/cmTC_25288.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-61ctzc/Debug/cmTC_25288.lib" /MACHINE:X64  /machine:x64 cmTC_25288.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_25288.vcxproj -> D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\cmTC_25288.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\cmTC_f41dd.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\cmTC_f41dd.write.1u.tlog" "cmTC_f41dd.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\cmTC_25288.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\cmTC_25288.write.1u.tlog" "cmTC_25288.dir\\Debug\\vcpkg.applocal.log"
           'pwsh.exe' is not recognized as an internal or external command,
           operable program or batch file.
-          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\cmTC_f41dd.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\cmTC_f41dd.write.1u.tlog" "cmTC_f41dd.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
-          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\Debug\\cmTC_f41dd.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\cmTC_f41dd.write.1u.tlog" "cmTC_f41dd.dir\\Debug\\vcpkg.applocal.log"
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\cmTC_25288.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\cmTC_25288.write.1u.tlog" "cmTC_25288.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\Debug\\cmTC_25288.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\cmTC_25288.write.1u.tlog" "cmTC_25288.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          Deleting file "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\unsuccessfulbuild".
-          Touching "cmTC_f41dd.dir\\Debug\\cmTC_f41dd.tlog\\cmTC_f41dd.lastbuildstate".
-        Done Building Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h95o4o\\cmTC_f41dd.vcxproj" (default targets).
+          Deleting file "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\unsuccessfulbuild".
+          Touching "cmTC_25288.dir\\Debug\\cmTC_25288.tlog\\cmTC_25288.lastbuildstate".
+        Done Building Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-61ctzc\\cmTC_25288.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:01.79
+        Time Elapsed 00:00:01.84
         
       exitCode: 0
   -
@@ -237,8 +237,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-m39l0c"
-      binary: "F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-m39l0c"
+      source: "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-gno0qh"
+      binary: "D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-gno0qh"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -248,49 +248,49 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-m39l0c'
+        Change Dir: 'D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-gno0qh'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_3c928.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_082ae.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 2/8/2026 2:09:37 PM.
+        Build started 2/8/2026 2:20:53 PM.
         
-        Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\cmTC_3c928.vcxproj" on node 1 (default targets).
+        Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\cmTC_082ae.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_3c928.dir\\Debug\\".
+          Creating directory "cmTC_082ae.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\".
-          Creating directory "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\".
+          Creating directory "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\".
+          Creating directory "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\unsuccessfulbuild".
+          Creating "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "F:\\hocke\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Debug"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\CL.exe /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_3c928.dir\\Debug\\\\" /Fd"cmTC_3c928.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\CL.exe /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_082ae.dir\\Debug\\\\" /Fd"cmTC_082ae.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.38.33145 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_3c928.dir\\Debug\\\\" /Fd"cmTC_3c928.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /I"F:\\hocke\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_082ae.dir\\Debug\\\\" /Fd"cmTC_082ae.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\cmTC_3c928.exe" /INCREMENTAL /ILK:"cmTC_3c928.dir\\Debug\\cmTC_3c928.ilk" /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-m39l0c/Debug/cmTC_3c928.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-m39l0c/Debug/cmTC_3c928.lib" /MACHINE:X64  /machine:x64 cmTC_3c928.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_3c928.vcxproj -> F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\cmTC_3c928.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.38.33130\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\cmTC_082ae.exe" /INCREMENTAL /ILK:"cmTC_082ae.dir\\Debug\\cmTC_082ae.ilk" /NOLOGO /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-gno0qh/Debug/cmTC_082ae.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-gno0qh/Debug/cmTC_082ae.lib" /MACHINE:X64  /machine:x64 cmTC_082ae.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_082ae.vcxproj -> D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\cmTC_082ae.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\cmTC_3c928.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\cmTC_3c928.write.1u.tlog" "cmTC_3c928.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\cmTC_082ae.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\cmTC_082ae.write.1u.tlog" "cmTC_082ae.dir\\Debug\\vcpkg.applocal.log"
           'pwsh.exe' is not recognized as an internal or external command,
           operable program or batch file.
-          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\cmTC_3c928.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\cmTC_3c928.write.1u.tlog" "cmTC_3c928.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
-          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\Debug\\cmTC_3c928.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\cmTC_3c928.write.1u.tlog" "cmTC_3c928.dir\\Debug\\vcpkg.applocal.log"
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\cmTC_082ae.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\cmTC_082ae.write.1u.tlog" "cmTC_082ae.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "F:\\hocke\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\Debug\\cmTC_082ae.exe" "F:\\hocke\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\cmTC_082ae.write.1u.tlog" "cmTC_082ae.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          Deleting file "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\unsuccessfulbuild".
-          Touching "cmTC_3c928.dir\\Debug\\cmTC_3c928.tlog\\cmTC_3c928.lastbuildstate".
-        Done Building Project "F:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m39l0c\\cmTC_3c928.vcxproj" (default targets).
+          Deleting file "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\unsuccessfulbuild".
+          Touching "cmTC_082ae.dir\\Debug\\cmTC_082ae.tlog\\cmTC_082ae.lastbuildstate".
+        Done Building Project "D:\\hocke\\AdvancedGraphics\\Custom-Ray-Tracer\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gno0qh\\cmTC_082ae.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:01.81
+        Time Elapsed 00:00:01.61
         
       exitCode: 0
   -
