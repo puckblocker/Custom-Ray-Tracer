@@ -38,6 +38,7 @@ int main()
     Camera camera;
     Intersect intersect;
     HitInfo hitInfo;
+    Light light;
     camera.camViewUpdate(); // initializes camera
     Ray ray;
     const int resWidth = 640;
@@ -132,6 +133,11 @@ int main()
     sphere.center = glm::vec3(0.0f, 0.0f, 0.0f);
     sphere.radius = 0.5f;
     sphere.objID = 1;
+    sphere.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
+    sphere.roughness = 0.1f;
+    sphere.metallic = 0.0f;
+    sphere.ior = 1.5f;
+    sphere.emissive = false;
 
     // Plane Stats
     Intersect::Plane plane;
@@ -145,6 +151,11 @@ int main()
     triangle.b = glm::vec3(0.866f, -0.75f, 0.0f);
     triangle.c = glm::vec3(0.0f, 0.75f, 0.0f);
     triangle.objID = 1;
+
+    // Point Light Stats
+    Light::pLight pointLight;
+    pointLight.color = glm::vec3(10.0f);
+    pointLight.origin = glm::vec3(1.0f, 1.0f, 1.0f);
 
     // OPEN WINDOW
     while (!glfwWindowShouldClose(window)) // keeps window up until closed by user
@@ -163,12 +174,20 @@ int main()
                 Ray ray = camera.rayGeneration(i, j);
 
                 // Generate Shapes
-                // hitInfo = intersect.intersectSphere(ray, sphere);
+                hitInfo = intersect.intersectSphere(ray, sphere);
                 // hitInfo = intersect.intersectPlane(ray, plane);
-                hitInfo = intersect.intersectTriangle(ray, triangle);
+                // hitInfo = intersect.intersectTriangle(ray, triangle);
+
+                // Generate Light
+                glm::vec3 lightColor = glm::vec3(0.0f);
+                if (hitInfo.valid == true)
+                {
+                    glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
+                    lightColor = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
+                }
 
                 //  Set Color
-                glm::vec3 color = setColor(ray, hitInfo.valid); // Sets the color for that pixel
+                glm::vec3 color = setColor(ray, hitInfo.valid, lightColor); // Sets the color for that pixel
                 // Grab RGB Components
                 int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
                 pixelBuffer[index] = color.x;       // grab red value

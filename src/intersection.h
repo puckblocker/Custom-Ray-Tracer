@@ -6,6 +6,7 @@
 // Infor On Intersection
 struct HitInfo
 {
+    glm::vec3 point;
     bool valid;
     float distance;
     unsigned int objID;
@@ -60,6 +61,9 @@ public:
             glm::vec3 point = ray.origin + ray.direction * crntDist;
             float sdf = glm::length(point - sphere.center) - sphere.radius; // signed distance function (distance from current position to object)
 
+            // FRAME CHANGE (global to local)
+            // glm::mat4 fcGlobal = glm::mat4()
+
             // INTERSECT CHECKS
             if (sdf < 0.0001f)
             {
@@ -70,6 +74,8 @@ public:
                 hitInfo.mat.metallic = sphere.metallic;
                 hitInfo.mat.ior = sphere.ior;
                 hitInfo.mat.emissive = sphere.emissive;
+                hitInfo.point = point;
+                hitInfo.normal = glm::normalize(point - sphere.center);
 
                 return hitInfo;
             }
@@ -93,6 +99,11 @@ public:
         glm::vec3 b;
         glm::vec3 c;
         unsigned int objID;
+        glm::vec3 albedo;
+        float roughness;
+        float metallic;
+        float ior;
+        float emissive;
     };
     HitInfo intersectTriangle(Ray ray, Triangle triangle)
     {
@@ -169,6 +180,11 @@ public:
         glm::vec3 position;
         glm::vec3 normal;
         unsigned int objID;
+        glm::vec3 albedo;
+        float roughness;
+        float metallic;
+        float ior;
+        float emissive;
     };
 
     HitInfo intersectPlane(Ray ray, Plane plane)
