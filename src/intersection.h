@@ -68,6 +68,7 @@ public:
             if (sdf < 0.0001f)
             {
                 hitInfo.valid = true;
+                hitInfo.distance = crntDist;
                 hitInfo.objID = sphere.objID;
                 hitInfo.mat.albedo = sphere.albedo;
                 hitInfo.mat.roughness = sphere.roughness;
@@ -210,6 +211,13 @@ public:
                 hitInfo.valid = true;
                 hitInfo.distance = crntDist;
                 hitInfo.objID = plane.objID;
+                hitInfo.mat.albedo = plane.albedo;
+                hitInfo.mat.roughness = plane.roughness;
+                hitInfo.mat.metallic = plane.metallic;
+                hitInfo.mat.ior = plane.ior;
+                hitInfo.mat.emissive = plane.emissive;
+                hitInfo.point = point;
+                hitInfo.normal = plane.normal;
                 return hitInfo;
             }
 

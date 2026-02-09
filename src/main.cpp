@@ -4,9 +4,9 @@
 #include "config.h"
 #include "rayData.h"
 #include "viewport.h"
-#include "color.h"
 #include "intersection.h"
 #include "lighting.h"
+#include "renderer.h"
 
 using namespace std;
 
@@ -41,6 +41,8 @@ int main()
     Light light;
     camera.camViewUpdate(); // initializes camera
     Ray ray;
+    Renderer renderer;
+    renderer.loadScene("scene.txt");
     const int resWidth = 640;
     const int resHeight = 640;
     // Create Pixel Buffer to Heap
@@ -134,7 +136,7 @@ int main()
     sphere.radius = 0.5f;
     sphere.objID = 1;
     sphere.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
-    sphere.roughness = 0.1f;
+    sphere.roughness = 0.5f;
     sphere.metallic = 0.0f;
     sphere.ior = 1.5f;
     sphere.emissive = false;
@@ -143,18 +145,23 @@ int main()
     Intersect::Plane plane;
     plane.normal = glm::vec3(0.0f, 1.0f, 0.0f);
     plane.position = glm::vec3(0.0f, -1.0f, 0.0f);
-    plane.objID = 1;
+    plane.objID = 2;
+    plane.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
+    plane.roughness = 0.1f;
+    plane.metallic = 0.0f;
+    plane.ior = 1.5f;
+    plane.emissive = false;
 
     // Triangle Stats
     Intersect::Triangle triangle;
     triangle.a = glm::vec3(-0.866f, -0.75f, 0.0f);
     triangle.b = glm::vec3(0.866f, -0.75f, 0.0f);
     triangle.c = glm::vec3(0.0f, 0.75f, 0.0f);
-    triangle.objID = 1;
+    triangle.objID = 3;
 
     // Point Light Stats
     Light::pLight pointLight;
-    pointLight.color = glm::vec3(10.0f);
+    pointLight.color = glm::vec3(100.0f);
     pointLight.origin = glm::vec3(1.0f, 1.0f, 1.0f);
 
     // OPEN WINDOW
@@ -164,37 +171,7 @@ int main()
         glClearColor(.75f, .5f, .75f, 1.0f); // set color that will be used to clear the screen
         glClear(GL_COLOR_BUFFER_BIT);        // clears screen with constant to tell which buffer to clear (color buffer)
 
-        // FRAME BUFFER
-        // Loop Through Pixel Rows (Preserves i and j pixels)
-        for (int j = 0; j < resHeight; j++) // render all pixels
-        {
-            for (int i = 0; i < resWidth; i++)
-            {
-                // Generate Rays
-                Ray ray = camera.rayGeneration(i, j);
-
-                // Generate Shapes
-                hitInfo = intersect.intersectSphere(ray, sphere);
-                // hitInfo = intersect.intersectPlane(ray, plane);
-                // hitInfo = intersect.intersectTriangle(ray, triangle);
-
-                // Generate Light
-                glm::vec3 lightColor = glm::vec3(0.0f);
-                if (hitInfo.valid == true)
-                {
-                    glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
-                    lightColor = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
-                }
-
-                //  Set Color
-                glm::vec3 color = setColor(ray, hitInfo.valid, lightColor); // Sets the color for that pixel
-                // Grab RGB Components
-                int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
-                pixelBuffer[index] = color.x;       // grab red value
-                pixelBuffer[index + 1] = color.y;   // grab green value
-                pixelBuffer[index + 2] = color.z;   // grab blue value
-            }
-        }
+        renderer.render(pixelBuffer, resWidth, resHeight);
 
         // DISPLAY RAY TRACER
         // Create Image / Upload to GPU

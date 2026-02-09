@@ -16,3 +16,7 @@ add_executable(ray_tracer
 target_include_directories(ray_tracer PRIVATE dependencies)
 # Link Libraries
 target_link_libraries(ray_tracer glfw3)
+
+# Copy Tes File to Debug
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scene.txt 
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
