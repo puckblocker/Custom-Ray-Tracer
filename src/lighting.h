@@ -52,10 +52,56 @@ public:
         glm::vec3 Fr = glm::vec3(FrScalar);
 
         // PBR BRDF Added Max to Prevent Error of Division by Zero When Perpendicular
-        glm::vec3 fr = (1.0f - Fr) * (hitInfo.mat.albedo / pi) + ((D * G * Fr) / (4 * glm::max(glm::dot(hitInfo.normal, viewDir), 0.0f) * glm::max(glm::dot(hitInfo.normal, lightDir), 0.0f) + 0.0001f));
-
+        float denom = 4.0f * glm::max(glm::dot(hitInfo.normal, viewDir), 0.0f) * glm::max(glm::dot(hitInfo.normal, lightDir), 0.0f) + 0.001f;
+        glm::vec3 fr = (1.0f - Fr) * (hitInfo.mat.albedo / pi) + ((D * G * Fr) / denom);
         // Return New Color
         outColor = fr * exitRad;
         return outColor;
+    }
+
+    // Direct Light
+    struct dLight
+    {
+        glm::vec3 direction;
+        glm::vec3 color;
+    };
+
+    glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir)
+    {
+        // VARIABLES
+        float pi = 3.14159265359;
+
+        // Directional light direction is constant for all points
+        glm::vec3 lightDir = glm::normalize(-light.direction);
+        float dotNL = glm::max(glm::dot(hitInfo.normal, lightDir), 0.0f);
+
+        glm::vec3 exitRad = light.color * dotNL;
+
+        glm::vec3 wh = glm::normalize(viewDir + lightDir); // Half-way vector
+        float alpha = glm::max(hitInfo.mat.roughness, 0.05f);
+        float alpha2 = alpha * alpha;
+
+        // PBR BRDF CALCULATION
+        // D (Normal Distribution Function)
+        float cosThetaH = glm::max(glm::dot(hitInfo.normal, wh), 0.0f);
+        float D_denom = (cosThetaH * cosThetaH * (alpha2 - 1.0f) + 1.0f);
+        float D = alpha2 / (pi * D_denom * D_denom + 0.0001f);
+
+        // G (Geometry Function)
+        float k = (alpha2 + 1.0f) / 8.0f;
+        float G = (glm::dot(hitInfo.normal, lightDir) / (glm::dot(hitInfo.normal, lightDir) * (1 - k) + k + 0.0001f)) *
+                  (glm::dot(hitInfo.normal, viewDir) / (glm::dot(hitInfo.normal, viewDir) * (1 - k) + k + 0.0001f));
+
+        // F0 (Fresnel Reflectance)
+        float F0 = hitInfo.mat.metallic / hitInfo.mat.ior;
+        float FrDot = glm::clamp(glm::dot(wh, viewDir), 0.0f, 1.0f);
+        float FrScalar = F0 + (1.0f - F0) * (glm::pow(1.0f - FrDot, 5.0f));
+        glm::vec3 Fr = glm::vec3(FrScalar);
+
+        // Fr / PBR
+        float brdf_denom = 4.0f * glm::max(glm::dot(hitInfo.normal, viewDir), 0.0f) * dotNL + 0.001f;
+        glm::vec3 fr = (1.0f - Fr) * (hitInfo.mat.albedo / pi) + ((D * G * Fr) / brdf_denom);
+
+        return fr * exitRad;
     }
 };

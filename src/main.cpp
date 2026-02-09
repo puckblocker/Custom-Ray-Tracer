@@ -35,11 +35,6 @@ int main()
 {
     // Variables
     GLFWwindow *window; //  create window
-    Camera camera;
-    Intersect intersect;
-    HitInfo hitInfo;
-    Light light;
-    camera.camViewUpdate(); // initializes camera
     Ray ray;
     Renderer renderer;
     renderer.loadScene("scene.txt");
@@ -129,40 +124,6 @@ int main()
 
     // Allocate the memory on the GPU (NULL because we haven't uploaded data yet)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resWidth, resHeight, 0, GL_RGB, GL_FLOAT, NULL); // creates a 2D texture imaghe (allocates GPU memory) / stores vertices in the texture
-
-    // Sphere Stats
-    Intersect::Sphere sphere;
-    sphere.center = glm::vec3(0.0f, 0.0f, 0.0f);
-    sphere.radius = 0.5f;
-    sphere.objID = 1;
-    sphere.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
-    sphere.roughness = 0.5f;
-    sphere.metallic = 0.0f;
-    sphere.ior = 1.5f;
-    sphere.emissive = false;
-
-    // Plane Stats
-    Intersect::Plane plane;
-    plane.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-    plane.position = glm::vec3(0.0f, -1.0f, 0.0f);
-    plane.objID = 2;
-    plane.albedo = glm::vec3(1.0f, 0.0f, 0.0f);
-    plane.roughness = 0.1f;
-    plane.metallic = 0.0f;
-    plane.ior = 1.5f;
-    plane.emissive = false;
-
-    // Triangle Stats
-    Intersect::Triangle triangle;
-    triangle.a = glm::vec3(-0.866f, -0.75f, 0.0f);
-    triangle.b = glm::vec3(0.866f, -0.75f, 0.0f);
-    triangle.c = glm::vec3(0.0f, 0.75f, 0.0f);
-    triangle.objID = 3;
-
-    // Point Light Stats
-    Light::pLight pointLight;
-    pointLight.color = glm::vec3(100.0f);
-    pointLight.origin = glm::vec3(1.0f, 1.0f, 1.0f);
 
     // OPEN WINDOW
     while (!glfwWindowShouldClose(window)) // keeps window up until closed by user

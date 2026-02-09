@@ -20,6 +20,7 @@ public:
     Intersect::Plane plane;
     Intersect::Triangle triangle;
     Light::pLight pointLight;
+    Light::dLight directionalLight;
 
     void render(float *pixelBuffer, int resWidth, int resHeight)
     {
@@ -118,7 +119,9 @@ public:
             {
                 glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
                 // Set Color
-                color = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
+                glm::vec3 pLightColor = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
+                glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+                color = pLightColor + dLightColor;
             }
 
             // WHITTED RAY TRACER
@@ -129,7 +132,7 @@ public:
             {
                 // Ray Setup
                 Ray reflectRay;
-                reflectRay.origin = hitInfo.point + (hitInfo.point + 0.01f);
+                reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
                 reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
                 // Call Itself (Recursion)
@@ -137,7 +140,7 @@ public:
             }
 
             // Glass / Translucent Surface
-            if (hitInfo.mat.ior >= 1.0f)
+            if (hitInfo.mat.ior > 1.0f)
             {
                 // Variables / Setup
                 float ior = hitInfo.mat.ior;
@@ -159,7 +162,7 @@ public:
                 {
                     // Ray Setup
                     Ray refractRay;
-                    refractRay.origin = hitInfo.point - (normal + 0.01f);
+                    refractRay.origin = hitInfo.point - (normal * 0.001f);
                     refractRay.direction = refractDir;
 
                     // Recursion
@@ -169,7 +172,7 @@ public:
                 {
                     // Ray Setup
                     Ray reflectRay;
-                    reflectRay.origin = hitInfo.point + (hitInfo.point * 0.01f);
+                    reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
                     reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
                     // Recursion
@@ -177,8 +180,16 @@ public:
                 }
             }
 
-            // Set Color
-            return indirectColor + color;
+            // Color For Glass
+            if (hitInfo.mat.ior > 1.0f)
+            {
+                return indirectColor;
+            }
+            else
+            {
+                // Set Color
+                return indirectColor + color;
+            }
         }
         else
         {
@@ -240,6 +251,12 @@ public:
                 // Light Stats
                 file >> pointLight.origin.x >> pointLight.origin.y >> pointLight.origin.z;
                 file >> pointLight.color.r >> pointLight.color.g >> pointLight.color.b;
+            }
+            else if (type == "dLight")
+            {
+                // Light Stats
+                file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
+                file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
             }
         }
         file.close();
