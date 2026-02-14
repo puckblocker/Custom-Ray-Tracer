@@ -1,3 +1,0 @@
-D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/ray_tracer.dir
-D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/ALL_BUILD.dir
-D:/hocke/AdvancedGraphics/Custom-Ray-Tracer/build/CMakeFiles/ZERO_CHECK.dir

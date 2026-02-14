@@ -22,6 +22,9 @@ public:
     Light::pLight pointLight;
     Light::dLight directionalLight;
 
+    // Track if directional light is loaded
+    bool hasDirectionalLight = false;
+
     void render(float *pixelBuffer, int resWidth, int resHeight)
     {
         camera.camViewUpdate();
@@ -120,7 +123,13 @@ public:
                 glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
                 // Set Color
                 glm::vec3 pLightColor = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
-                glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+
+                glm::vec3 dLightColor = glm::vec3(0.0f);
+                if (hasDirectionalLight)
+                {
+                    dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+                }
+
                 color = pLightColor + dLightColor;
             }
 
@@ -132,7 +141,7 @@ public:
             {
                 // Ray Setup
                 Ray reflectRay;
-                reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
+                reflectRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
                 reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
                 // Call Itself (Recursion)
@@ -172,7 +181,8 @@ public:
                 {
                     // Ray Setup
                     Ray reflectRay;
-                    reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
+                    // FIXED: Use hitInfo.normal instead of hitInfo.point for offset
+                    reflectRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
                     reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
                     // Recursion
@@ -224,7 +234,8 @@ public:
                 // Material Stats
                 file >> sphere.albedo.r >> sphere.albedo.g >> sphere.albedo.b;
                 file >> sphere.metallic >> sphere.roughness >> sphere.ior >> sphere.emissive;
-                sphere.objID += objID;
+                sphere.objID = objID;
+                objID++;
             }
             // else if(type == "triangle")
             // {
@@ -234,7 +245,8 @@ public:
             //     // Material Stats
             //     file >> triangle.albedo .r >> triangle.albedo.g >> triangle.albedo.b;
             //     file >> triangle.metallic >> triangle.roughness >> triangle.ior >> triangle.emissive;
-            //     triangle.objID += objID;
+            //     triangle.objID = objID;
+            //     objID++;
             // }
             else if (type == "Plane")
             {
@@ -244,7 +256,8 @@ public:
                 // Material Stats
                 file >> plane.albedo.r >> plane.albedo.g >> plane.albedo.b;
                 file >> plane.metallic >> plane.roughness >> plane.ior >> plane.emissive;
-                sphere.objID += objID;
+                plane.objID = objID;
+                objID++;
             }
             else if (type == "pLight")
             {
@@ -257,6 +270,7 @@ public:
                 // Light Stats
                 file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
                 file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
+                hasDirectionalLight = true;
             }
         }
         file.close();

@@ -18,18 +18,12 @@ public:
         glm::vec3 outColor;
         float pi = 3.14159265359;
 
-        // MOST IMPORTANT > radiance = radiant flux / area * angle // radiant flux = energy / time // irradiance = energy / time * area
-        // power leaving surface = power surface emits + (incoming power - absorbed power)
-        // Shading is from > Radiance(color) seen in specific outgoing direction w sampled at point p on a surface (L0(p, w0) = Le(p,w0) + Lr(p, w0)) (Lr = reflected light afetr absorbtion in our direction)
-        // BRDF (fr)  fr(p, wo, wi) = (d*L0(p,w0)) / (Li(p,wi)*(n*wi)d*wi)
-        // fr(p, wo, wi) >= 0, BRDF never negative // fr(p, wo, wi) = fr(p,wi,w0) Helmhotz, direction of calc doesn't matter // Energy conservation, BRDF doesn't create energy
-
         // EXITANT RADIANCE
         float lightDist = glm::length(light.origin - point);
-        float attentuation = 1.0f / (lightDist * lightDist);                   // reduce lighting effect
-        glm::vec3 lightDir = glm::normalize(light.origin - point);             // wi
-        float irradiance = glm::max(glm::dot(lightDir, hitInfo.normal), 0.0f); // how much light grabbed by surface (angle light is hitting surface) capped to prevent negative light
-        glm::vec3 exitRad = light.color * attentuation * irradiance;
+        float attentuation = 1.0f / (lightDist * lightDist);       // reduce lighting effect
+        glm::vec3 lightDir = glm::normalize(light.origin - point); // wi
+        // float irradiance = glm::max(glm::dot(lightDir, hitInfo.normal), 0.0f); // how much light grabbed by surface (angle light is hitting surface) capped to prevent negative light
+        glm::vec3 exitRad = light.color * attentuation;
 
         // PBR BRDF CALCULATION
         glm::vec3 R = hitInfo.mat.albedo;
@@ -45,8 +39,11 @@ public:
         float G = (glm::dot(hitInfo.normal, lightDir) / (glm::dot(hitInfo.normal, lightDir) * (1 - k) + k)) * // half of G
                   (glm::dot(hitInfo.normal, viewDir) / (glm::dot(hitInfo.normal, viewDir) * (1 - k) + k));    // other half of G
 
-        // Fr Fresnal Reflectance Schlick Approximation
-        float F0 = hitInfo.mat.metallic / hitInfo.mat.ior;           // reflectance at normal incidence
+        // Fr Fresnel Reflectance Calculations
+        float iorRatio = (hitInfo.mat.ior - 1.0f) / (hitInfo.mat.ior + 1.0f);
+        float F0_dielectric = iorRatio * iorRatio;
+        float F0 = glm::mix(F0_dielectric, 0.8f, hitInfo.mat.metallic);
+
         float FrDot = glm::clamp(glm::dot(wh, viewDir), 0.0f, 1.0f); // prevent negative (cuts off light)
         float FrScalar = F0 + (1.0f - F0) * (glm::pow(1.0f - FrDot, 5.0f));
         glm::vec3 Fr = glm::vec3(FrScalar);
@@ -92,8 +89,11 @@ public:
         float G = (glm::dot(hitInfo.normal, lightDir) / (glm::dot(hitInfo.normal, lightDir) * (1 - k) + k + 0.0001f)) *
                   (glm::dot(hitInfo.normal, viewDir) / (glm::dot(hitInfo.normal, viewDir) * (1 - k) + k + 0.0001f));
 
-        // F0 (Fresnel Reflectance)
-        float F0 = hitInfo.mat.metallic / hitInfo.mat.ior;
+        // F0 Calculation
+        float iorRatio = (hitInfo.mat.ior - 1.0f) / (hitInfo.mat.ior + 1.0f);
+        float F0_dielectric = iorRatio * iorRatio;
+        float F0 = glm::mix(F0_dielectric, 0.8f, hitInfo.mat.metallic);
+
         float FrDot = glm::clamp(glm::dot(wh, viewDir), 0.0f, 1.0f);
         float FrScalar = F0 + (1.0f - F0) * (glm::pow(1.0f - FrDot, 5.0f));
         glm::vec3 Fr = glm::vec3(FrScalar);

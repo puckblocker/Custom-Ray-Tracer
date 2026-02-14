@@ -17,6 +17,9 @@ target_include_directories(ray_tracer PRIVATE dependencies)
 # Link Libraries
 target_link_libraries(ray_tracer glfw3)
 
-# Copy Tes File to Debug
+# Copy Test File to Debug
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scene.txt 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+# Copy glfw.3 File to Build
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/glfw3.lib
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/build)

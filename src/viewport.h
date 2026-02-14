@@ -70,7 +70,9 @@ public:
         Ray ray;
 
         // Find the Ray Origin // TEST PIXEL OFFSET of .5 <-
-        ray.origin = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) + (((float)j + 0.5f) * image.pixelHeight * basis.yhat); // Calculated through the our basis and pixel dimensions
+        // ray.origin = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) + (((float)j + 0.5f) * image.pixelHeight * basis.yhat); // Calculated through the our basis and pixel dimensions
+        ray.origin = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) +
+                     (((float)j + 0.5f) * image.pixelHeight * basis.yhat);
         // Find Ray Direction
         ray.direction = glm::normalize(ray.origin - origin); // Calculated by geting normalized unit of the vector between ray origin and camera origin
 
