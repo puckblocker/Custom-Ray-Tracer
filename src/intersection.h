@@ -196,7 +196,7 @@ public:
         // Variables
         float crntDist = 0.0f;
         hitInfo.valid = false;
-        int maxSteps = 50;
+        int maxSteps = 100;
         float threshold = 0.001f;
 
         // Ray Marching

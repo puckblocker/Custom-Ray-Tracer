@@ -59,7 +59,7 @@ public:
 
         // Trowbridge Reitz (Normal Distribution Function)
         glm::vec3 wh = glm::normalize(0.5f * (viewDir + lightDir)); // half-way vector (from Blinn Phong, used to calculate reflection angle)
-        float alpha = hitInfo.mat.roughness;                        // roughness parameter
+        float alpha = glm::max(hitInfo.mat.roughness, 0.01f);       // roughness parameter
         float alphaSqr = alpha * alpha;
         float k = (alphaSqr + 1.0f) / 8.0f;                       // remapping of roughness parameter
         float D = DistrFunc(alphaSqr, hitInfo.normal, wh);        // normal distribution function

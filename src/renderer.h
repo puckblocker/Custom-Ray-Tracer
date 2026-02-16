@@ -52,8 +52,8 @@ public:
         glm::vec3 specCoeff = glm::vec3(0.0f);
 
         // Check For Max Depth
-        // if (depth >= 5)
-        //     return color;
+        if (depth >= 5)
+            return color;
 
         // First Intersect
         HitInfo hitInfo;
@@ -127,46 +127,46 @@ public:
             }
 
             // WHITTED RAY TRACER
-            // glm::vec3 indirectRad;
+            glm::vec3 indirectRad;
 
             // Metallic Surface
-            // if (hitInfo.mat.metallic)
-            // {
-            //     // Check For Max Depth
-            //     if (depth < 5)
-            //     {
-            //         depth++;
+            if (hitInfo.mat.metallic)
+            {
+                // Reflection Ray
+                Ray reflctRay;
+                reflctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+                reflctRay.direction = glm::reflect(ray.direction, hitInfo.normal);
+                // reflctRay.direction = ray.direction - 2.0f * glm::dot(ray.direction, hitInfo.normal) * hitInfo.normal;
 
-            //         // Reflection Ray
-            //         Ray reflctRay;
-            //         reflctRay.origin = hitInfo.point;
-            //         reflctRay.direction = hitInfo.normal;
-            //         color += (specCoeff * tracer(reflctRay, depth));
-            //     }
-            // }
-            // else
-            // {
-            //     color = specCoeff;
-            // }
+                glm::vec3 reflctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
+
+                color = specCoeff + (reflctColor * hitInfo.mat.albedo);
+            }
 
             // Glass Surface
-            // if (hitInfo.mat.ior >= 1.5f)
-            // {
-            //     // Check For Max Depth
-            //     if (depth < 5)
-            //     {
-            //         depth++;
-            //         // Reflection Ray
-            //         Ray reflctRay;
-            //         reflctRay.origin = hitInfo.point;
-            //         reflctRay.direction = hitInfo.normal;
-            //         color += (specCoeff * tracer(reflctRay, depth));
-            //         // Refraction Ray
-            //         Ray refrctRay;
-            //         refrctRay.origin = hitInfo.point;
-            //         refrctRay.direction = -hitInfo.normal;
-            //     }
-            // }
+            else if (hitInfo.mat.ior >= 1.5f)
+            {
+                // Reflection Ray
+                Ray reflctRay;
+                reflctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+                reflctRay.direction = glm::reflect(ray.direction, hitInfo.normal);
+
+                glm::vec3 reflctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
+
+                // Refraction Ray
+                Ray refrctRay;
+                refrctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+                refrctRay.direction = glm::refract(-ray.direction, -hitInfo.normal, hitInfo.mat.ior);
+
+                glm::vec3 refrctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
+
+                color = specCoeff + (reflctColor * refrctColor);
+            }
+
+            else
+            {
+                color = specCoeff;
+            }
 
             // WHITTED RAY TRACER
             // glm::vec3 indirectColor = glm::vec3(0.0f);
@@ -235,7 +235,7 @@ public:
             //     return indirectColor + color;
             // }
 
-            return color = specCoeff;
+            return color;
         }
         else
         {
