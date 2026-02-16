@@ -20,10 +20,7 @@ public:
     Intersect::Plane plane;
     Intersect::Triangle triangle;
     Light::pLight pointLight;
-    Light::dLight directionalLight;
-
-    // Track if directional light is loaded
-    bool hasDirectionalLight = false;
+    // Light::dLight directionalLight;
 
     void render(float *pixelBuffer, int resWidth, int resHeight)
     {
@@ -52,10 +49,11 @@ public:
     glm::vec3 tracer(Ray ray, unsigned int depth)
     {
         glm::vec3 color = glm::vec3(0.0f);
+        glm::vec3 specCoeff = glm::vec3(0.0f);
 
         // Check For Max Depth
-        if (depth >= 5)
-            return color;
+        // if (depth >= 5)
+        //     return color;
 
         // First Intersect
         HitInfo hitInfo;
@@ -116,90 +114,128 @@ public:
             if (inShadow)
             {
                 // Set Color
-                color = glm::vec3(0.05f) * hitInfo.mat.albedo;
+                specCoeff = glm::vec3(0.05f) * hitInfo.mat.albedo;
             }
             else
             {
                 glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
                 // Set Color
-                glm::vec3 pLightColor = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
-
-                glm::vec3 dLightColor = glm::vec3(0.0f);
-                if (hasDirectionalLight)
-                {
-                    dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
-                }
-
-                color = pLightColor + dLightColor;
+                glm::vec3 pLightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
+                // glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+                // color = pLightColor + dLightColor;
+                specCoeff = pLightRad;
             }
 
             // WHITTED RAY TRACER
-            glm::vec3 indirectColor = glm::vec3(0.0f);
+            // glm::vec3 indirectRad;
+
+            // Metallic Surface
+            // if (hitInfo.mat.metallic)
+            // {
+            //     // Check For Max Depth
+            //     if (depth < 5)
+            //     {
+            //         depth++;
+
+            //         // Reflection Ray
+            //         Ray reflctRay;
+            //         reflctRay.origin = hitInfo.point;
+            //         reflctRay.direction = hitInfo.normal;
+            //         color += (specCoeff * tracer(reflctRay, depth));
+            //     }
+            // }
+            // else
+            // {
+            //     color = specCoeff;
+            // }
+
+            // Glass Surface
+            // if (hitInfo.mat.ior >= 1.5f)
+            // {
+            //     // Check For Max Depth
+            //     if (depth < 5)
+            //     {
+            //         depth++;
+            //         // Reflection Ray
+            //         Ray reflctRay;
+            //         reflctRay.origin = hitInfo.point;
+            //         reflctRay.direction = hitInfo.normal;
+            //         color += (specCoeff * tracer(reflctRay, depth));
+            //         // Refraction Ray
+            //         Ray refrctRay;
+            //         refrctRay.origin = hitInfo.point;
+            //         refrctRay.direction = -hitInfo.normal;
+            //     }
+            // }
+
+            // WHITTED RAY TRACER
+            // glm::vec3 indirectColor = glm::vec3(0.0f);
 
             // Mirror Surface
-            if (hitInfo.mat.metallic > 0.1f)
-            {
-                // Ray Setup
-                Ray reflectRay;
-                reflectRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
-                reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
+            // if (hitInfo.mat.metallic > 0.1f)
+            // {
+            //     // Ray Setup
+            //     Ray reflectRay;
+            //     reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
+            //     reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
-                // Call Itself (Recursion)
-                indirectColor += tracer(reflectRay, depth + 1) * hitInfo.mat.albedo;
-            }
+            //     // Call Itself (Recursion)
+            //     indirectColor += tracer(reflectRay, depth + 1) * hitInfo.mat.albedo;
+            // }
 
             // Glass / Translucent Surface
-            if (hitInfo.mat.ior > 1.0f)
-            {
-                // Variables / Setup
-                float ior = hitInfo.mat.ior;
-                float refractIndex = 1.0f / ior; // measure of air to glass ratio
-                glm::vec3 normal = hitInfo.normal;
+            // if (hitInfo.mat.ior > 1.0f)
+            // {
+            //     // Variables / Setup
+            //     float ior = hitInfo.mat.ior;
+            //     float refractIndex = 1.0f / ior; // measure of air to glass ratio
+            //     glm::vec3 normal = hitInfo.normal;
 
-                // Check For Inside Object
-                if (glm::dot(ray.direction, hitInfo.normal) > 0.0f)
-                {
-                    refractIndex = ior;
-                    // Flip Normal
-                    normal = -hitInfo.normal;
-                }
+            //     // Check For Inside Object
+            //     if (glm::dot(ray.direction, hitInfo.normal) > 0.0f)
+            //     {
+            //         refractIndex = ior;
+            //         // Flip Normal
+            //         normal = -hitInfo.normal;
+            //     }
 
-                glm::vec3 refractDir = glm::refract(ray.direction, normal, refractIndex);
+            //     glm::vec3 refractDir = glm::refract(ray.direction, normal, refractIndex);
 
-                // Check For Internal Reflection
-                if (glm::length(refractDir) > 0.001f)
-                {
-                    // Ray Setup
-                    Ray refractRay;
-                    refractRay.origin = hitInfo.point - (normal * 0.001f);
-                    refractRay.direction = refractDir;
+            //     // Check For Internal Reflection
+            //     if (glm::length(refractDir) > 0.001f)
+            //     {
+            //         // Ray Setup
+            //         Ray refractRay;
+            //         refractRay.origin = hitInfo.point - (normal * 0.001f);
+            //         refractRay.direction = refractDir;
 
-                    // Recursion
-                    indirectColor += tracer(refractRay, depth + 1);
-                }
-                else
-                {
-                    // Ray Setup
-                    Ray reflectRay;
-                    // FIXED: Use hitInfo.normal instead of hitInfo.point for offset
-                    reflectRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
-                    reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
+            //         // Recursion
+            //         indirectColor += tracer(refractRay, depth + 1);
+            //     }
+            //     else
+            //     {
+            //         // Ray Setup
+            //         Ray reflectRay;
+            //         reflectRay.origin = hitInfo.point + (hitInfo.point * 0.001f);
+            //         reflectRay.direction = glm::reflect(ray.direction, hitInfo.normal);
 
-                    // Recursion
-                    indirectColor += tracer(reflectRay, depth + 1) * hitInfo.mat.albedo;
-                }
-            }
+            //         // Recursion
+            //         indirectColor += tracer(reflectRay, depth + 1) * hitInfo.mat.albedo;
+            //     }
+            // }
 
             // Color For Glass
-            if (hitInfo.mat.ior > 1.0f)
-            {
-                return indirectColor;
-            }
-            else
-            {
-                // Set Color
-                return indirectColor + color;
-            }
+            // if (hitInfo.mat.ior > 1.0f)
+            // {
+            //     return indirectColor;
+            // }
+            // else
+            // {
+            //     // Set Color
+            //     return indirectColor + color;
+            // }
+
+            return color = specCoeff;
         }
         else
         {
@@ -234,8 +270,10 @@ public:
                 // Material Stats
                 file >> sphere.albedo.r >> sphere.albedo.g >> sphere.albedo.b;
                 file >> sphere.metallic >> sphere.roughness >> sphere.ior >> sphere.emissive;
-                sphere.objID = objID;
-                objID++;
+                sphere.objID += objID;
+                std::cout << "Sphere Position: " << sphere.center.x << " " << sphere.center.y << " " << sphere.center.z << std::endl;
+                std::cout << "Radius: " << sphere.radius << std::endl;
+                std::cout << "Metallic: " << sphere.metallic << " Roughness: " << sphere.roughness << " IOR: " << sphere.ior << " Emissive: " << sphere.emissive << std::endl;
             }
             // else if(type == "triangle")
             // {
@@ -245,8 +283,7 @@ public:
             //     // Material Stats
             //     file >> triangle.albedo .r >> triangle.albedo.g >> triangle.albedo.b;
             //     file >> triangle.metallic >> triangle.roughness >> triangle.ior >> triangle.emissive;
-            //     triangle.objID = objID;
-            //     objID++;
+            //     triangle.objID += objID;
             // }
             else if (type == "Plane")
             {
@@ -256,8 +293,7 @@ public:
                 // Material Stats
                 file >> plane.albedo.r >> plane.albedo.g >> plane.albedo.b;
                 file >> plane.metallic >> plane.roughness >> plane.ior >> plane.emissive;
-                plane.objID = objID;
-                objID++;
+                plane.objID += objID;
             }
             else if (type == "pLight")
             {
@@ -265,13 +301,12 @@ public:
                 file >> pointLight.origin.x >> pointLight.origin.y >> pointLight.origin.z;
                 file >> pointLight.color.r >> pointLight.color.g >> pointLight.color.b;
             }
-            else if (type == "dLight")
-            {
-                // Light Stats
-                file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
-                file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
-                hasDirectionalLight = true;
-            }
+            // else if (type == "dLight")
+            // {
+            //     // Light Stats
+            //     file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
+            //     file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
+            // }
         }
         file.close();
     }

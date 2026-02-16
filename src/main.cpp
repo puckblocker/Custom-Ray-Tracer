@@ -35,7 +35,6 @@ int main()
 {
     // Variables
     GLFWwindow *window; //  create window
-    Ray ray;
     Renderer renderer;
     renderer.loadScene("scene.txt");
     const int resWidth = 640;

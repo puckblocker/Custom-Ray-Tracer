@@ -17,7 +17,7 @@ struct HitInfo
     {
         glm::vec3 albedo; // object's reflectance/color
         float roughness;  // 0 = smooth // 1 = rough
-        float metallic;   // metallic / conductor
+        bool metallic;    // metallic / conductor
         float ior;        // Index of Refraction (is object glass)
         bool emissive;    // is object a light
     };
@@ -39,7 +39,7 @@ public:
         unsigned int objID;
         glm::vec3 albedo;
         float roughness;
-        float metallic;
+        bool metallic;
         float ior;
         float emissive;
     };
