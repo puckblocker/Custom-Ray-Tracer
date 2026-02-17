@@ -52,7 +52,7 @@ public:
         // Variables
         float crntDist = 0.0f;
         hitInfo.valid = false;
-        int maxSteps = 10;
+        int maxSteps = 100;
 
         // Ray Marching
         for (int i = 0; i < maxSteps; i++)
