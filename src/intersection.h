@@ -54,6 +54,19 @@ public:
         hitInfo.valid = false;
         int maxSteps = 100;
 
+        // Fixes For Dielectrics
+        float startSDF = glm::length(ray.origin - sphere.center) - sphere.radius; // starting sdf to prevent negative distance inside sphere
+        float raySign;                                                            // essentially a flip switch to help with starting sdf
+
+        if (startSDF < 0.0f)
+        {
+            raySign = -1.0f;
+        }
+        else
+        {
+            raySign = 1.0f;
+        }
+
         // Ray Marching
         for (int i = 0; i < maxSteps; i++)
         {
@@ -61,11 +74,10 @@ public:
             glm::vec3 point = ray.origin + ray.direction * crntDist;
             float sdf = glm::length(point - sphere.center) - sphere.radius; // signed distance function (distance from current position to object)
 
-            // FRAME CHANGE (global to local)
-            // glm::mat4 fcGlobal = glm::mat4()
+            float newSDF = sdf * raySign; // new sdf to prevent negative distance
 
             // INTERSECT CHECKS
-            if (sdf < 0.0001f)
+            if (newSDF < 0.0001f)
             {
                 hitInfo.valid = true;
                 hitInfo.distance = crntDist;
@@ -82,7 +94,7 @@ public:
             }
 
             // March
-            crntDist += sdf; // current step distance (how far step will travel)
+            crntDist += newSDF; // current step distance (how far step will travel)
 
             // Break Out
             if (crntDist > 100.0f)
@@ -160,6 +172,14 @@ public:
             {
                 hitInfo.valid = true;
                 hitInfo.distance = crntDist;
+                hitInfo.objID = triangle.objID;
+                hitInfo.mat.albedo = triangle.albedo;
+                hitInfo.mat.roughness = triangle.roughness;
+                hitInfo.mat.metallic = triangle.metallic;
+                hitInfo.mat.ior = triangle.ior;
+                hitInfo.mat.emissive = triangle.emissive;
+                hitInfo.point = point;
+                hitInfo.normal = norm;
                 return hitInfo;
             }
 
@@ -196,7 +216,7 @@ public:
         // Variables
         float crntDist = 0.0f;
         hitInfo.valid = false;
-        int maxSteps = 100;
+        int maxSteps = 200;
         float threshold = 0.001f;
 
         // Ray Marching
@@ -205,6 +225,7 @@ public:
             // CALCULATIONS
             glm::vec3 point = ray.origin + ray.direction * crntDist;
             float sdf = glm::dot((point - plane.position), plane.normal); // signed distance function (distance from current position to object)
+
             // INTERSECT CHECKS
             if (glm::epsilonEqual(sdf, 0.0f, threshold))
             {

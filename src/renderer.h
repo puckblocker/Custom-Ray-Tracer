@@ -20,7 +20,7 @@ public:
     std::vector<Intersect::Plane> planes;
     std::vector<Intersect::Triangle> triangles;
     Light::pLight pointLight;
-    // Light::dLight directionalLight;
+    Light::dLight directionalLight;
 
     // Fresnel Reflectance
     glm::vec3 FrsRflct(glm::vec3 normal, glm::vec3 direction, glm::vec3 F0)
@@ -107,11 +107,14 @@ public:
         }
 
         // Check For Triangle
-        // tempHit = intersect.intersectTriangle(ray, triangle);
-        // if (tempHit.valid && tempHit.distance < hitInfo.distance)
-        // {
-        //     hitInfo = tempHit;
-        // }
+        for (i = 0; i < triangles.size(); i++)
+        {
+            tempHit = intersect.intersectTriangle(ray, triangles[i]);
+            if (tempHit.valid && tempHit.distance < hitInfo.distance)
+            {
+                hitInfo = tempHit;
+            }
+        }
 
         // Generate Light
         if (hitInfo.valid)
@@ -137,9 +140,12 @@ public:
             }
 
             // Triangle
-            // shadowHit = intersect.intersectTriangle(shadowRay, triangle);
-            // if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
-            //     inShadow = true;
+            for (i = 0; i < triangles.size(); i++)
+            {
+                shadowHit = intersect.intersectTriangle(shadowRay, triangles[i]);
+                if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
+                    inShadow = true;
+            }
 
             // Plane
             for (i = 0; i < planes.size(); i++)
@@ -161,8 +167,8 @@ public:
                 glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
                 // Set Color
                 glm::vec3 pLightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
-                // glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
-                // color = pLightColor + dLightColor;
+                glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+                color += dLightColor * hitInfo.mat.albedo;
 
                 // PBR BRDF CALCULATION
                 float pi = 3.14159265359;
@@ -182,57 +188,105 @@ public:
                 F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // take base reflectivity or surface color based on if metallic
                 glm::vec3 Fr = FrsRflct(wh, viewDir, F0);                    // fresnel term
 
+                // Ideal Diffuse
+                glm::vec3 idealDiffuse = glm::vec3(0.0f);
+                if (hitInfo.mat.ior < 1.5f)
+                {
+                    idealDiffuse = R / pi; // scattering of light (hemisphere)
+                }
+
                 // Final BRDF Result
-                glm::vec3 roughSpec = (D * G * Fr) / (0.001f + 4.0f * (glm::dot(hitInfo.normal, viewDir) * glm::dot(hitInfo.normal, lightDir)));
-                glm::vec3 idealDiffuse = R / pi;    // scattering of light (hemisphere)
+                glm::vec3 roughSpec = (D * G * Fr) / glm::max((0.001f + 4.0f * (glm::dot(hitInfo.normal, viewDir) * glm::dot(hitInfo.normal, lightDir))), 0.001f);
                 glm::vec3 refrctEnergy = 1.0f - Fr; // energy available to refraction
                 glm::vec3 fr = refrctEnergy * idealDiffuse + roughSpec;
 
                 specCoeff = pLightRad * fr;
+            }
 
-                // WHITTED RAY TRACER
-                glm::vec3 indirectRad;
+            color += specCoeff;
+            // WHITTED RAY TRACER
+            glm::vec3 indirectRad;
 
-                // Metallic Surface
-                if (hitInfo.mat.metallic)
+            // Metallic Surface
+            if (hitInfo.mat.metallic)
+            {
+                // Reflection Ray
+                Ray reflctRay;
+                reflctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+                reflctRay.direction = glm::reflect(ray.direction, hitInfo.normal);
+
+                glm::vec3 reflctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
+
+                color += (reflctColor * hitInfo.mat.albedo);
+            }
+
+            // Glass Surface
+            else if (hitInfo.mat.ior >= 1.5f)
+            {
+                glm::vec3 attenuation = glm::vec3(1.0f);
+
+                // Reflection Ray
+                Ray reflctRay;
+                glm::vec3 reflctColor = glm::vec3(0.0f);
+
+                // Refraction Ray
+                Ray refrctRay;
+                glm::vec3 refrctColor = glm::vec3(0.0f);
+
+                // Direction Through Snell's Law
+                float ior; // ratio of refract index (air) / refract index (glass)
+                glm::vec3 normal;
+
+                // Outside Object
+                if (glm::dot(ray.direction, hitInfo.normal) < 0.0f)
                 {
-                    // Reflection Ray
-                    Ray reflctRay;
-                    reflctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
-                    reflctRay.direction = glm::reflect(ray.direction, hitInfo.normal);
-                    // reflctRay.direction = ray.direction - 2.0f * glm::dot(ray.direction, hitInfo.normal) * hitInfo.normal;
-
-                    glm::vec3 reflctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
-
-                    color = specCoeff + (reflctColor * hitInfo.mat.albedo);
+                    ior = 1.0f / hitInfo.mat.ior; // air
+                    normal = hitInfo.normal;
                 }
-
-                // Glass Surface
-                else if (hitInfo.mat.ior >= 1.5f)
-                {
-                    // Reflection Ray
-                    Ray reflctRay;
-                    reflctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
-                    reflctRay.direction = glm::reflect(ray.direction, hitInfo.normal);
-
-                    glm::vec3 reflctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
-
-                    // Refraction Ray
-                    Ray refrctRay;
-                    refrctRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
-
-                    // Direction Through Snell's Law
-                    refrctRay.direction = glm::refract(ray.direction, hitInfo.normal, hitInfo.mat.ior);
-
-                    glm::vec3 refrctColor = glm::vec3(1.0f) * tracer(reflctRay, depth + 1);
-
-                    color = specCoeff + (reflctColor * refrctColor);
-                }
-
-                // Non Metallic / Glass Surface
+                // Inside Object
                 else
                 {
-                    color = specCoeff;
+                    ior = hitInfo.mat.ior;    // glass
+                    normal = -hitInfo.normal; // flip normal
+                }
+
+                // Snell's Law Variables
+                float cosTheta = glm::min(glm::dot(-ray.direction, normal), 1.0f); // cosine angle of incidence (how straight on light is hitting surface)
+                float sinTheta = glm::sqrt(1.0f - cosTheta * cosTheta);            // sine angle of incidence (how much light bends)
+
+                // Total Internal Reflection (100% of Light Reflects)
+                if (ior * sinTheta > 1.0f) // only reflect
+                {
+                    reflctRay.origin = hitInfo.point + (normal * 0.001f);
+                    reflctRay.direction = glm::reflect(ray.direction, normal);
+
+                    reflctColor = attenuation * tracer(reflctRay, depth + 1);
+
+                    color += reflctColor;
+                }
+                else // refract and reflect
+                {
+                    // Send Refraction Ray
+                    refrctRay.origin = hitInfo.point - (normal * 0.001f);
+                    refrctRay.direction = glm::refract(ray.direction, normal, ior);
+                    glm::vec3 refrctRes = attenuation * tracer(refrctRay, depth + 1);
+
+                    // Send Reflection Ray (Does Both^)
+                    reflctRay.origin = hitInfo.point + (normal * 0.001f);
+                    reflctRay.direction = glm::reflect(ray.direction, normal);
+                    glm::vec3 reflctRes = tracer(reflctRay, depth + 1);
+
+                    // Schlick Approximation For Reflectance Percentage
+                    glm::vec3 F0 = glm::vec3(0.04f); // how much light will pass throuh when looking straight at glass
+                    glm::vec3 viewDir = -ray.direction;
+                    glm::vec3 frsnl = FrsRflct(normal, viewDir, F0); // find percentage of reflection
+
+                    // Implement the Reflectance Percentage
+                    reflctColor = reflctRes * frsnl;
+                    refrctColor = refrctRes * (glm::vec3(1.0f) - frsnl);
+
+                    // Combine the Reflection and Refraction
+                    color += (refrctColor + reflctColor) * attenuation;
                 }
             }
 
@@ -273,6 +327,7 @@ public:
                 file >> newSphere.albedo.r >> newSphere.albedo.g >> newSphere.albedo.b;
                 file >> newSphere.metallic >> newSphere.roughness >> newSphere.ior >> newSphere.emissive;
                 objID += 1;
+                newSphere.objID = objID;
 
                 spheres.push_back(newSphere);
 
@@ -280,16 +335,21 @@ public:
                 std::cout << "Radius: " << newSphere.radius << std::endl;
                 std::cout << "Metallic: " << newSphere.metallic << " Roughness: " << newSphere.roughness << " IOR: " << newSphere.ior << " Emissive: " << newSphere.emissive << std::endl;
             }
-            // else if(type == "triangle")
-            // {
-            //     // Shape Stats
-            //     file >> triangle.center.x >> triangle.center.y >> triangle.center.z;
-            //     file >> triangle.radius;
-            //     // Material Stats
-            //     file >> triangle.albedo .r >> triangle.albedo.g >> triangle.albedo.b;
-            //     file >> triangle.metallic >> triangle.roughness >> triangle.ior >> triangle.emissive;
-            //     triangle.objID += objID;
-            // }
+            else if (type == "Triangle")
+            {
+                Intersect::Triangle newTriangle;
+                // Shape Stats
+                file >> newTriangle.a.x >> newTriangle.a.y >> newTriangle.a.z;
+                file >> newTriangle.b.x >> newTriangle.b.y >> newTriangle.b.z;
+                file >> newTriangle.c.x >> newTriangle.c.y >> newTriangle.c.z;
+                // Material Stats
+                file >> newTriangle.albedo.r >> newTriangle.albedo.g >> newTriangle.albedo.b;
+                file >> newTriangle.metallic >> newTriangle.roughness >> newTriangle.ior >> newTriangle.emissive;
+
+                objID += 1;
+                newTriangle.objID = objID;
+                triangles.push_back(newTriangle);
+            }
             else if (type == "Plane")
             {
                 Intersect::Plane newPlane;
@@ -299,7 +359,9 @@ public:
                 // Material Stats
                 file >> newPlane.albedo.r >> newPlane.albedo.g >> newPlane.albedo.b;
                 file >> newPlane.metallic >> newPlane.roughness >> newPlane.ior >> newPlane.emissive;
-                newPlane.objID += objID;
+                objID += 1;
+                newPlane.objID = objID;
+
                 planes.push_back(newPlane);
             }
             else if (type == "pLight")
@@ -309,12 +371,12 @@ public:
                 file >> pointLight.origin.x >> pointLight.origin.y >> pointLight.origin.z;
                 file >> pointLight.color.r >> pointLight.color.g >> pointLight.color.b;
             }
-            // else if (type == "dLight")
-            // {
-            //     // Light Stats
-            //     file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
-            //     file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
-            // }
+            else if (type == "dLight")
+            {
+                // Light Stats
+                file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
+                file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
+            }
         }
         file.close();
     }
