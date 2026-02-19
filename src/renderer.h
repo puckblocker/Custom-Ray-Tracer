@@ -120,9 +120,28 @@ public:
         if (hitInfo.valid)
         {
             // Shadow Variables
-            glm::vec3 toLight = pointLight.origin - hitInfo.point;
-            float distToLight = glm::length(toLight);
+            glm::vec3 toLight; // = pointLight.origin - hitInfo.point;
+            float distToLight; // = glm::length(toLight);
+            glm::vec3 lightRad;
             bool inShadow = false;
+            float pi = 3.14159265359;
+            glm::vec3 R = hitInfo.mat.albedo;                             // reflectance
+            glm::vec3 w0 = glm::normalize(camera.origin - hitInfo.point); // outgoing direction
+
+            if (glm::length(directionalLight.color) > 0.0f)
+            {
+                toLight = glm::normalize(-directionalLight.direction);
+                distToLight = 1000000.0f;
+                lightRad = light.directionalLight(directionalLight, hitInfo, w0);
+            }
+            else if (glm::length(pointLight.color) > 0.0f)
+            {
+                toLight = pointLight.origin - hitInfo.point;
+                distToLight = glm::length(toLight);
+                lightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, w0);
+            }
+
+            glm::vec3 wi = glm::normalize(toLight); // incoming direction
 
             // Generate Shadows
             Ray shadowRay;
@@ -165,17 +184,9 @@ public:
             else
             {
                 // PBR BRDF CALCULATIONS (DIRECT LIGHTING)
-                float pi = 3.14159265359;
-                glm::vec3 R = hitInfo.mat.albedo;                             // reflectance
-                glm::vec3 w0 = glm::normalize(camera.origin - hitInfo.point); // outgoing direction
-                glm::vec3 wi = glm::normalize(-directionalLight.direction);   // incoming direction
-
-                glm::vec3 dLightRad = light.directionalLight(directionalLight, hitInfo, w0);
 
                 // Ideal Diffuse
                 glm::vec3 idealDiffuse = R / pi;
-                float cosTerm = glm::dot(hitInfo.normal, wi);
-                cosTerm = glm::max(cosTerm, 0.0f); // may need to combine this with ^
 
                 // IDEAL SPECULAR
                 // Fresnel Schlick Approx (Calculate Reflection Based On Incident Angle)
@@ -186,17 +197,17 @@ public:
                 }
 
                 // Ideal Specular BRDF
-                glm::vec3 wr;
-                glm::vec3 idealSpec = glm::vec3(0.0f); // ideal spec BRDF is 0 by default
-                if (wi == wr)                          // only changes at angle of reflection
-                {
-                    idealSpec = FrsRflct(hitInfo.normal, wr, F0) / glm::dot(hitInfo.normal, wr);
-                }
+                // glm::vec3 wr;
+                // glm::vec3 idealSpec = glm::vec3(0.0f); // ideal spec BRDF is 0 by default
+                // if (wi == wr)                          // only changes at angle of reflection
+                // {
+                //     idealSpec = FrsRflct(hitInfo.normal, wr, F0) / glm::dot(hitInfo.normal, wr);
+                // }
 
                 // ROUGH SPECULAR (Direction Diffuse)
 
                 // Trowbridge Reitz (Normal Distr Function)
-                glm::vec3 wh = glm::normalize(0.5f * (w0, wi));       // half way vector
+                glm::vec3 wh = glm::normalize(0.5f * (w0 + wi));      // half way vector
                 float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
                 float alphaSqr = alpha * alpha;
                 float k = (alphaSqr + 1.0f) / 8.0f;
@@ -205,6 +216,12 @@ public:
 
                 // Rough Specular BRDF
                 glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, w0)) / (4.0f * glm::dot(hitInfo.normal, w0) * glm::dot(hitInfo.normal, wi));
+
+                // PBR BRDF RESULT (Direct Lighting)
+                glm::vec3 directLighting = idealDiffuse + roughSpec;
+
+                // Add To Color
+                specCoeff = directLighting * lightRad;
 
                 // glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
                 // // Set Color

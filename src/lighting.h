@@ -9,8 +9,8 @@ public:
     // POINT LIGHT
     struct pLight
     {
-        glm::vec3 origin; // light position in global coords
-        glm::vec3 color;  // exitant radiance
+        glm::vec3 origin = glm::vec3(0.0f); // light position in global coords
+        glm::vec3 color = glm::vec3(0.0f);  // exitant radiance
     };
     glm::vec3 pointLight(glm::vec3 point, pLight light, HitInfo hitInfo, glm::vec3 viewDir)
     {
@@ -41,8 +41,8 @@ public:
     // Direct Light
     struct dLight
     {
-        glm::vec3 direction;
-        glm::vec3 color;
+        glm::vec3 direction = glm::vec3(0.0f);
+        glm::vec3 color = glm::vec3(0.0f);
     };
 
     glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir)

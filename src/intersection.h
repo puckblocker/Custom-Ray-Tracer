@@ -224,7 +224,7 @@ public:
         {
             // CALCULATIONS
             glm::vec3 point = ray.origin + ray.direction * crntDist;
-            float sdf = glm::dot((point - plane.position), plane.normal); // signed distance function (distance from current position to object)
+            float sdf = glm::abs(glm::dot((point - plane.position), plane.normal)); // signed distance function (distance from current position to object)
 
             // INTERSECT CHECKS
             if (glm::epsilonEqual(sdf, 0.0f, threshold))
