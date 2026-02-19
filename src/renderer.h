@@ -164,43 +164,88 @@ public:
             // Not In Shadow
             else
             {
-                glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
-                // Set Color
-                glm::vec3 pLightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
-                glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
-                color += dLightColor * hitInfo.mat.albedo;
-
-                // PBR BRDF CALCULATION
+                // PBR BRDF CALCULATIONS (DIRECT LIGHTING)
                 float pi = 3.14159265359;
-                glm::vec3 lightDir = glm::normalize(pointLight.origin - hitInfo.point); // wi (incoming direction)
-                glm::vec3 R = hitInfo.mat.albedo;
+                glm::vec3 R = hitInfo.mat.albedo;                             // reflectance
+                glm::vec3 w0 = glm::normalize(camera.origin - hitInfo.point); // outgoing direction
+                glm::vec3 wi = glm::normalize(-directionalLight.direction);   // incoming direction
 
-                // Trowbridge Reitz (Normal Distribution Function)
-                glm::vec3 wh = glm::normalize(0.5f * (viewDir + lightDir)); // half-way vector (from Blinn Phong, used to calculate reflection angle)
-                float alpha = glm::max(hitInfo.mat.roughness, 0.01f);       // roughness parameter
-                float alphaSqr = alpha * alpha;
-                float k = (alphaSqr + 1.0f) / 8.0f;                       // remapping of roughness parameter
-                float D = DistrFunc(alphaSqr, hitInfo.normal, wh);        // normal distribution function
-                float G = GeomFunc(k, hitInfo.normal, viewDir, lightDir); // geometry function
-
-                // Frensal-Schlick (Ideal Specular)
-                glm::vec3 F0 = glm::vec3(0.04f);                             // fresnel reflectance, base reflectivity (holds true for most dielectrics, value from learnopengl.com)
-                F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // take base reflectivity or surface color based on if metallic
-                glm::vec3 Fr = FrsRflct(wh, viewDir, F0);                    // fresnel term
+                glm::vec3 dLightRad = light.directionalLight(directionalLight, hitInfo, w0);
 
                 // Ideal Diffuse
-                glm::vec3 idealDiffuse = glm::vec3(0.0f);
-                if (hitInfo.mat.ior < 1.5f)
+                glm::vec3 idealDiffuse = R / pi;
+                float cosTerm = glm::dot(hitInfo.normal, wi);
+                cosTerm = glm::max(cosTerm, 0.0f); // may need to combine this with ^
+
+                // IDEAL SPECULAR
+                // Fresnel Schlick Approx (Calculate Reflection Based On Incident Angle)
+                glm::vec3 F0 = glm::vec3(0.04f);
+                if (hitInfo.mat.metallic)
                 {
-                    idealDiffuse = R / pi; // scattering of light (hemisphere)
+                    F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // mix the fresnel reflection with the base color based on how metallic object is
                 }
 
-                // Final BRDF Result
-                glm::vec3 roughSpec = (D * G * Fr) / glm::max((0.001f + 4.0f * (glm::dot(hitInfo.normal, viewDir) * glm::dot(hitInfo.normal, lightDir))), 0.001f);
-                glm::vec3 refrctEnergy = 1.0f - Fr; // energy available to refraction
-                glm::vec3 fr = refrctEnergy * idealDiffuse + roughSpec;
+                // Ideal Specular BRDF
+                glm::vec3 wr;
+                glm::vec3 idealSpec = glm::vec3(0.0f); // ideal spec BRDF is 0 by default
+                if (wi == wr)                          // only changes at angle of reflection
+                {
+                    idealSpec = FrsRflct(hitInfo.normal, wr, F0) / glm::dot(hitInfo.normal, wr);
+                }
 
-                specCoeff = pLightRad * fr;
+                // ROUGH SPECULAR (Direction Diffuse)
+
+                // Trowbridge Reitz (Normal Distr Function)
+                glm::vec3 wh = glm::normalize(0.5f * (w0, wi));       // half way vector
+                float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
+                float alphaSqr = alpha * alpha;
+                float k = (alphaSqr + 1.0f) / 8.0f;
+                float D = DistrFunc(alphaSqr, hitInfo.normal, wh); // how aligned surface normal is with microfacet normals
+                float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
+
+                // Rough Specular BRDF
+                glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, w0)) / (4.0f * glm::dot(hitInfo.normal, w0) * glm::dot(hitInfo.normal, wi));
+
+                // glm::vec3 viewDir = glm::normalize(camera.origin - hitInfo.point); // w0
+                // // Set Color
+                // // glm::vec3 pLightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, viewDir);
+                // glm::vec3 dLightColor = light.directionalLight(directionalLight, hitInfo, viewDir);
+                // // specCoeff += dLightColor * hitInfo.mat.albedo;
+                // // specCoeff += dLightColor;
+
+                // // PBR BRDF CALCULATION
+                // float pi = 3.14159265359;
+                // glm::vec3 lightDir = glm::normalize(pointLight.origin - hitInfo.point); // wi (incoming direction)
+                // lightDir = glm::normalize(-directionalLight.direction);
+                // glm::vec3 R = hitInfo.mat.albedo;
+
+                // // Trowbridge Reitz (Normal Distribution Function)
+                // glm::vec3 wh = glm::normalize(0.5f * (viewDir + lightDir)); // half-way vector (from Blinn Phong, used to calculate reflection angle)
+                // float alpha = glm::max(hitInfo.mat.roughness, 0.01f);       // roughness parameter
+                // float alphaSqr = alpha * alpha;
+                // float k = (alphaSqr + 1.0f) / 8.0f;                       // remapping of roughness parameter
+                // float D = DistrFunc(alphaSqr, hitInfo.normal, wh);        // normal distribution function
+                // float G = GeomFunc(k, hitInfo.normal, viewDir, lightDir); // geometry function
+
+                // // Frensal-Schlick (Ideal Specular)
+                // glm::vec3 F0 = glm::vec3(0.04f);                             // fresnel reflectance, base reflectivity (holds true for most dielectrics, value from learnopengl.com)
+                // F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // take base reflectivity or surface color based on if metallic
+                // glm::vec3 Fr = FrsRflct(wh, viewDir, F0);                    // fresnel term
+
+                // // Ideal Diffuse
+                // glm::vec3 idealDiffuse = glm::vec3(0.0f);
+                // if (hitInfo.mat.ior < 1.5f)
+                // {
+                //     idealDiffuse = R / pi; // scattering of light (hemisphere)
+                // }
+
+                // // Final BRDF Result
+                // glm::vec3 roughSpec = (D * G * Fr) / glm::max((0.001f + 4.0f * (glm::dot(hitInfo.normal, viewDir) * glm::dot(hitInfo.normal, lightDir))), 0.001f);
+                // glm::vec3 refrctEnergy = 1.0f - Fr; // energy available to refraction
+                // // glm::vec3 fr = refrctEnergy * idealDiffuse + roughSpec;
+                // glm::vec3 fr = refrctEnergy * idealDiffuse;
+                // // specCoeff += pLightRad;
+                // specCoeff += dLightColor * fr;
             }
 
             color += specCoeff;
@@ -376,6 +421,17 @@ public:
                 // Light Stats
                 file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
                 file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
+            }
+            else if (type == "Camera")
+            {
+                file >> camera.origin.x >> camera.origin.y >> camera.origin.z;
+                file >> camera.up.x >> camera.up.y >> camera.up.z;
+                file >> camera.gaze.x >> camera.gaze.y >> camera.gaze.z;
+                file >> camera.length;
+            }
+            else if (type == "Viewport")
+            {
+                file >> camera.viewport.height >> camera.viewport.width;
             }
         }
         file.close();

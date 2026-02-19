@@ -6,16 +6,16 @@ class Camera
 {
 public:
     // Camera
-    glm::vec3 origin = glm::vec3(0.0f, 0.0f, 10.0f); // focal point, standard right hand coords
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);      // vertical orientation
-    glm::vec3 gaze = glm::vec3(0.0f, 0.0f, -1.0f);   // direction camera is facing
-    float length = 10.0f;                            // distance from viewport center to camera
+    glm::vec3 origin = glm::vec3(0.0f); // focal point, standard right hand coords
+    glm::vec3 up = glm::vec3(0.0f);     // vertical orientation
+    glm::vec3 gaze = glm::vec3(0.0f);   // direction camera is facing
+    float length;                       // distance from viewport center to camera
 
     // Viewport
     struct Viewport
     {
-        float height = 2.0f; // values so view is simplified to between -1 and +1
-        float width = 2.0f;
+        float height; // values so view is simplified to between -1 and +1
+        float width;
         glm::vec3 origin;
     };
 

@@ -51,7 +51,7 @@ public:
         glm::vec3 lightDir = glm::normalize(-light.direction);
 
         // Cosine Term (How Much Light Is Hitting)
-        float lightAmnt = glm::max(glm::dot(hitInfo.normal, lightDir), 0.0f);
+        float lightAmnt = glm::max(glm::dot(-light.direction, hitInfo.normal), 0.0f);
 
         glm::vec3 exitRad = light.color * lightAmnt;
 
