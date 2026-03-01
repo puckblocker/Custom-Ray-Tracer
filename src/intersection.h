@@ -3,7 +3,7 @@
 #include "viewport.h"
 #include "rayData.h"
 
-// Infor On Intersection
+// Info On Intersection
 struct HitInfo
 {
     glm::vec3 point;
@@ -23,6 +23,14 @@ struct HitInfo
     };
 
     Material mat;
+};
+
+// Info On Transforms
+struct xForm
+{
+    int crntID;
+    int prntID;
+    glm::mat4 transform; // matrix transforms
 };
 
 class Intersect
@@ -46,8 +54,55 @@ public:
 
     HitInfo intersectSphere(Ray ray, Sphere sphere)
     {
-        // Instantiate Struct
+        // TRANSFORMS
+        // Variables
         HitInfo hitInfo;
+        std::vector<xForm> xFormArray;
+
+        int crntIndx = hitInfo.objID;
+        int prntIndx = -1;
+
+        // Matrices
+        glm::mat4 crntTrn;
+        glm::mat4 prntTrn;
+        glm::mat4 idntMat = glm::mat4(1.0f); // dont alter last row (affine)
+        prntTrn = idntMat;
+
+        // Object Indices / Parent Indices
+        for (int i = 0; i < xFormArray.size(); i++)
+        {
+            // Check For Current Index
+            if (xFormArray[i].crntID == crntIndx)
+            {
+                prntIndx = xFormArray[i].prntID; // set parent index
+            }
+        }
+
+        // Global Parent Check
+        while (prntIndx != -1) // loop until global parent
+        {
+            prntTrn = xFormArray[prntIndx].transform * prntTrn; // combine the parent transforms
+            prntIndx = xFormArray[prntIndx].prntID;             // go to next parent
+        }
+
+        // Matrix Multiplication
+        crntTrn = prntTrn * xFormArray[crntIndx].transform;
+
+        // Scale
+        float scale = glm::length(glm::vec3(crntTrn[0]));
+        float invScale = 1.0f / scale; // gets local scale (shrink ray instead of enlarge shape)
+
+        // Rotation (Grab Rotation Matrix Vals)
+        glm::mat3 rot = glm::mat3(crntTrn) * invScale; // grabs rotation values and purges scale
+        glm::mat3 invRot = glm::transpose(rot);
+
+        // Translation
+        glm::vec3 trans = glm::vec3(crntTrn[3]);
+        glm::vec3 invTrans = -(invRot * trans);
+
+        // FRAME CHANGE (Global to Local)
+
+        // INTERSECTION
 
         // Variables
         float crntDist = 0.0f;
