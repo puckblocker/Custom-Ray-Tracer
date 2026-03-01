@@ -1,5 +1,6 @@
 #pragma once // Ensures header file only include once throughout program
-#include "config.h"
+
+#include <glm/glm.hpp>
 
 class Ray
 {

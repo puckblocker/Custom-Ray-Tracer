@@ -7,9 +7,12 @@ project(ray_tracer VERSION 1.0.0)
 find_package(OpenGL REQUIRED)
 
 # Build
-add_executable(ray_tracer 
-    src/config.h 
-    src/main.cpp 
+add_executable(ray_tracer
+    src/main.cpp
+    src/intersection.cpp
+    src/lighting.cpp
+    src/renderer.cpp
+    src/viewport.cpp 
     src/glad.c)
 
 # Located Header Files
