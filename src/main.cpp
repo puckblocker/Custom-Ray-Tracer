@@ -124,6 +124,9 @@ int main()
     // Allocate the memory on the GPU (NULL because we haven't uploaded data yet)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resWidth, resHeight, 0, GL_RGB, GL_FLOAT, NULL); // creates a 2D texture imaghe (allocates GPU memory) / stores vertices in the texture
 
+    // CALL RENDERER
+    renderer.render(pixelBuffer, resWidth, resHeight);
+
     // OPEN WINDOW
     while (!glfwWindowShouldClose(window)) // keeps window up until closed by user
     {
@@ -131,7 +134,7 @@ int main()
         glClearColor(.75f, .5f, .75f, 1.0f); // set color that will be used to clear the screen
         glClear(GL_COLOR_BUFFER_BIT);        // clears screen with constant to tell which buffer to clear (color buffer)
 
-        renderer.render(pixelBuffer, resWidth, resHeight);
+        // renderer.render(pixelBuffer, resWidth, resHeight);
 
         // DISPLAY RAY TRACER
         // Create Image / Upload to GPU

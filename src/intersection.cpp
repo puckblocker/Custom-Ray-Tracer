@@ -4,55 +4,79 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // SPHERE INTERSECTION
-HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere)
+HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xFormArray)
 {
     // TRANSFORMS
     // Variables
     HitInfo hitInfo;
-    // std::vector<xForm> xFormArray;
 
-    // int crntIndx = hitInfo.objID;
-    // int prntIndx = -1;
+    int crntIndx = sphere.objID;
+    int prntIndx = -1;
 
-    // // Matrices
-    // glm::mat4 crntTrn;
-    // glm::mat4 prntTrn;
-    // glm::mat4 idntMat = glm::mat4(1.0f); // dont alter last row (affine)
-    // prntTrn = idntMat;
+    // Matrices
+    glm::mat4 crntTrn;
+    glm::mat4 localTrn = glm::mat4(1.0f);
+    glm::mat4 prntTrn;
+    glm::mat4 idntMat = glm::mat4(1.0f); // dont alter last row (affine)
+    prntTrn = idntMat;
 
-    // // Object Indices / Parent Indices
-    // for (int i = 0; i < xFormArray.size(); i++)
-    // {
-    //     // Check For Current Index
-    //     if (xFormArray[i].crntID == crntIndx)
-    //     {
-    //         prntIndx = xFormArray[i].prntID; // set parent index
-    //     }
-    // }
+    // Object Indices / Parent Indices
+    for (int i = 0; i < xFormArray.size(); i++)
+    {
+        // Check For Current Index
+        if (xFormArray[i].crntID == crntIndx)
+        {
+            localTrn = xFormArray[i].transform;
+            prntIndx = xFormArray[i].prntID; // set parent index
+            break;
+        }
+    }
 
-    // // Global Parent Check
-    // while (prntIndx != -1) // loop until global parent
-    // {
-    //     prntTrn = xFormArray[prntIndx].transform * prntTrn; // combine the parent transforms
-    //     prntIndx = xFormArray[prntIndx].prntID;             // go to next parent
-    // }
+    // Global Parent Check
+    bool prntFound = false;
+    while (prntIndx != -1) // loop until global parent
+    {
+        for (int i = 0; i < xFormArray.size(); i++)
+        {
+            if (xFormArray[i].crntID == prntIndx)
+            {
+                prntTrn = xFormArray[i].transform * prntTrn; // combine the parent transforms
+                prntIndx = xFormArray[i].prntID;             // go to next parent
+                prntFound = true;
+                break;
+            }
+        }
 
-    // // Matrix Multiplication
-    // crntTrn = prntTrn * xFormArray[crntIndx].transform;
+        if (!prntFound)
+            break;
+    }
 
-    // // Scale
-    // float scale = glm::length(glm::vec3(crntTrn[0]));
-    // float invScale = 1.0f / scale; // gets local scale (shrink ray instead of enlarge shape)
+    // Matrix Multiplication
+    crntTrn = prntTrn * localTrn;
 
-    // // Rotation (Grab Rotation Matrix Vals)
-    // glm::mat3 rot = glm::mat3(crntTrn) * invScale; // grabs rotation values and purges scale
-    // glm::mat3 invRot = glm::transpose(rot);
+    // Scale
+    float scale = glm::length(glm::vec3(crntTrn[0]));
+    float invScale = 1.0f / scale; // gets local scale (shrink ray instead of enlarge shape)
 
-    // // Translation
-    // glm::vec3 trans = glm::vec3(crntTrn[3]);
-    // glm::vec3 invTrans = -(invRot * trans);
+    // Rotation (Grab Rotation Matrix Vals)
+    glm::mat3 rot = glm::mat3(crntTrn) * invScale; // grabs rotation values and purges scale
+    glm::mat3 invRot = glm::transpose(rot);
+
+    // Translation
+    glm::vec3 trans = glm::vec3(crntTrn[3]);
+    glm::vec3 invTrans = -(invRot * trans);
 
     // FRAME CHANGE (Global to Local)
+    // Basis Change
+    glm::mat4 basisChange = glm::mat4(glm::vec4(invRot[0] * invScale, 0.0f),
+                                      glm::vec4(invRot[1] * invScale, 0.0f),
+                                      glm::vec4(invRot[2] * invScale, 0.0f),
+                                      glm::vec4(invTrans, 1.0f));
+
+    // Local Ray
+    Ray localRay;
+    localRay.origin = glm::vec3(basisChange * glm::vec4(ray.origin, 1.0f));
+    localRay.direction = basisChange * glm::vec4(ray.direction, 0.0f);
 
     // INTERSECTION
 
@@ -62,8 +86,8 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere)
     int maxSteps = 100;
 
     // Fixes For Dielectrics
-    float startSDF = glm::length(ray.origin - sphere.center) - sphere.radius; // starting sdf to prevent negative distance inside sphere
-    float raySign;                                                            // essentially a flip switch to help with starting sdf
+    float startSDF = glm::length(localRay.origin - sphere.center) - sphere.radius; // starting sdf to prevent negative distance inside sphere
+    float raySign;                                                                 // essentially a flip switch to help with starting sdf
 
     if (startSDF < 0.0f)
     {
@@ -78,7 +102,7 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere)
     for (int i = 0; i < maxSteps; i++)
     {
         // CALCULATIONS
-        glm::vec3 point = ray.origin + ray.direction * crntDist;
+        glm::vec3 point = localRay.origin + localRay.direction * crntDist;
         float sdf = glm::length(point - sphere.center) - sphere.radius; // signed distance function (distance from current position to object)
 
         float newSDF = sdf * raySign; // new sdf to prevent negative distance

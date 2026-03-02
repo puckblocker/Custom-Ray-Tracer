@@ -21,6 +21,7 @@ public:
     std::vector<Intersect::Sphere> spheres;
     std::vector<Intersect::Plane> planes;
     std::vector<Intersect::Triangle> triangles;
+    std::vector<Intersect::xForm> xForms;
     Light::pLight pointLight;
     Light::dLight directionalLight;
 

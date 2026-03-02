@@ -108,7 +108,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     int i = 0;
     for (i = 0; i < spheres.size(); i++)
     {
-        tempHit = intersect.intersectSphere(ray, spheres[i]);
+        tempHit = intersect.intersectSphere(ray, spheres[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -172,7 +172,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         HitInfo shadowHit;
         for (i = 0; i < spheres.size(); i++)
         {
-            shadowHit = intersect.intersectSphere(shadowRay, spheres[i]);
+            shadowHit = intersect.intersectSphere(shadowRay, spheres[i], xForms);
             if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID) // Check for hit and behind object
                 inShadow = true;
         }
@@ -342,6 +342,7 @@ void Renderer::loadScene(const std::string &filename)
             std::cout << "Radius: " << newSphere.radius << std::endl;
             std::cout << "Metallic: " << newSphere.metallic << " Roughness: " << newSphere.roughness << " IOR: " << newSphere.ior << " Emissive: " << newSphere.emissive << std::endl;
         }
+
         else if (type == "Triangle")
         {
             Intersect::Triangle newTriangle;
@@ -357,6 +358,7 @@ void Renderer::loadScene(const std::string &filename)
             newTriangle.objID = objID;
             triangles.push_back(newTriangle);
         }
+
         else if (type == "Plane")
         {
             Intersect::Plane newPlane;
@@ -371,6 +373,7 @@ void Renderer::loadScene(const std::string &filename)
 
             planes.push_back(newPlane);
         }
+
         else if (type == "pLight")
         {
             // Light::pLight newPointLight;
@@ -378,12 +381,14 @@ void Renderer::loadScene(const std::string &filename)
             file >> pointLight.origin.x >> pointLight.origin.y >> pointLight.origin.z;
             file >> pointLight.color.r >> pointLight.color.g >> pointLight.color.b;
         }
+
         else if (type == "dLight")
         {
             // Light Stats
             file >> directionalLight.direction.x >> directionalLight.direction.y >> directionalLight.direction.z;
             file >> directionalLight.color.r >> directionalLight.color.g >> directionalLight.color.b;
         }
+
         else if (type == "Camera")
         {
             file >> camera.origin.x >> camera.origin.y >> camera.origin.z;
@@ -391,9 +396,36 @@ void Renderer::loadScene(const std::string &filename)
             file >> camera.gaze.x >> camera.gaze.y >> camera.gaze.z;
             file >> camera.length;
         }
+
         else if (type == "Viewport")
         {
             file >> camera.viewport.height >> camera.viewport.width;
+        }
+
+        else if (type == "Transform")
+        {
+            // Variables
+            Intersect::xForm trnsfrm;
+            trnsfrm.transform = glm::mat4(1.0f);
+            glm::vec4 rot(1.0f);
+            glm::vec3 trns(1.0f);
+            float scale = 1.0f;
+
+            // Object IDs
+            file >> trnsfrm.crntID >> trnsfrm.prntID;
+            // Rotation
+            file >> rot.x >> rot.y >> rot.z >> rot.w;
+            // Translation
+            file >> trns.x >> trns.y >> trns.z;
+            // Scale
+            file >> scale;
+
+            // Transforms
+            trnsfrm.transform = glm::translate(trnsfrm.transform, trns);
+            trnsfrm.transform = glm::rotate(trnsfrm.transform, glm::radians(rot.w), glm::vec3(rot));
+            trnsfrm.transform = glm::scale(trnsfrm.transform, glm::vec3(scale));
+
+            xForms.push_back(trnsfrm);
         }
     }
     file.close();

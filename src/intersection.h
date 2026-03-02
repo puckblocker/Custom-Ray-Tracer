@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "rayData.h"
 
@@ -26,17 +27,17 @@ struct HitInfo
     Material mat;
 };
 
-// Info On Transforms
-struct xForm
-{
-    int crntID;
-    int prntID;
-    glm::mat4 transform; // matrix transforms
-};
-
 class Intersect
 {
 public:
+    // Info On Transforms
+    struct xForm
+    {
+        int crntID;
+        int prntID;
+        glm::mat4 transform; // matrix transforms
+    };
+
     // SPHERE
     struct Sphere
     {
@@ -78,7 +79,7 @@ public:
     };
 
     // FUNCTION SIGNATURES
-    HitInfo intersectSphere(Ray ray, Sphere sphere);
+    HitInfo intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xFormArray);
     HitInfo intersectTriangle(Ray ray, Triangle triangle);
     HitInfo intersectPlane(Ray ray, Plane plane);
 };
