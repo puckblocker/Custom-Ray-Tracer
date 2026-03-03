@@ -76,7 +76,7 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xF
     // Local Ray
     Ray localRay;
     localRay.origin = glm::vec3(basisChange * glm::vec4(ray.origin, 1.0f));
-    localRay.direction = basisChange * glm::vec4(ray.direction, 0.0f);
+    localRay.direction = glm::normalize(basisChange * glm::vec4(ray.direction, 0.0f));
 
     // INTERSECTION
 
@@ -119,7 +119,8 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xF
             hitInfo.mat.ior = sphere.ior;
             hitInfo.mat.emissive = sphere.emissive;
             hitInfo.point = point;
-            hitInfo.normal = glm::normalize(point - sphere.center);
+            glm::vec3 localNorm = glm::normalize(point - sphere.center);
+            hitInfo.normal = glm::normalize(rot * localNorm);
 
             return hitInfo;
         }

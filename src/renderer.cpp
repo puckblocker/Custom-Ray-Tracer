@@ -1,6 +1,8 @@
 #include "renderer.h"
 #include <iostream>
 #include <fstream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 // HELPER FUNCTIONS
 // Fresnel Reflectance
@@ -426,6 +428,9 @@ void Renderer::loadScene(const std::string &filename)
             trnsfrm.transform = glm::scale(trnsfrm.transform, glm::vec3(scale));
 
             xForms.push_back(trnsfrm);
+
+            std::cout << "Transform for ID " << trnsfrm.crntID << ":\n";
+            std::cout << glm::to_string(trnsfrm.transform) << "\n\n";
         }
     }
     file.close();
