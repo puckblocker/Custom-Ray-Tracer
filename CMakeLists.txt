@@ -5,6 +5,7 @@ project(ray_tracer VERSION 1.0.0)
 
 # Find Package
 find_package(OpenGL REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # Build
 add_executable(ray_tracer
@@ -19,6 +20,7 @@ add_executable(ray_tracer
 target_include_directories(ray_tracer PRIVATE dependencies)
 # Link Libraries
 target_link_libraries(ray_tracer glfw3)
+target_link_libraries(ray_tracer OpenMP::OpenMP_CXX)
 
 # Copy Test File to Debug
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scene.txt 

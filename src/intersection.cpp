@@ -138,10 +138,81 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xF
 }
 
 // TRIANGLE INTERSECTION
-HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle)
+HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle, std::vector<xForm> xFormArray)
 {
-    // Instantiate Struct
+    // TRANSFORMS
+    // Variables
     HitInfo hitInfo;
+
+    int crntIndx = triangle.objID;
+    int prntIndx = -1;
+
+    // Matrices
+    glm::mat4 crntTrn;
+    glm::mat4 localTrn = glm::mat4(1.0f);
+    glm::mat4 prntTrn;
+    glm::mat4 idntMat = glm::mat4(1.0f); // dont alter last row (affine)
+    prntTrn = idntMat;
+
+    // Object Indices / Parent Indices
+    for (int i = 0; i < xFormArray.size(); i++)
+    {
+        // Check For Current Index
+        if (xFormArray[i].crntID == crntIndx)
+        {
+            localTrn = xFormArray[i].transform;
+            prntIndx = xFormArray[i].prntID; // set parent index
+            break;
+        }
+    }
+
+    // Global Parent Check
+    bool prntFound = false;
+    while (prntIndx != -1) // loop until global parent
+    {
+        for (int i = 0; i < xFormArray.size(); i++)
+        {
+            if (xFormArray[i].crntID == prntIndx)
+            {
+                prntTrn = xFormArray[i].transform * prntTrn; // combine the parent transforms
+                prntIndx = xFormArray[i].prntID;             // go to next parent
+                prntFound = true;
+                break;
+            }
+        }
+
+        if (!prntFound)
+            break;
+    }
+
+    // Matrix Multiplication
+    crntTrn = prntTrn * localTrn;
+
+    // Scale
+    float scale = glm::length(glm::vec3(crntTrn[0]));
+    float invScale = 1.0f / scale; // gets local scale (shrink ray instead of enlarge shape)
+
+    // Rotation (Grab Rotation Matrix Vals)
+    glm::mat3 rot = glm::mat3(crntTrn) * invScale; // grabs rotation values and purges scale
+    glm::mat3 invRot = glm::transpose(rot);
+
+    // Translation
+    glm::vec3 trans = glm::vec3(crntTrn[3]);
+    glm::vec3 invTrans = -(invRot * trans);
+
+    // FRAME CHANGE (Global to Local)
+    // Basis Change
+    glm::mat4 basisChange = glm::mat4(glm::vec4(invRot[0] * invScale, 0.0f),
+                                      glm::vec4(invRot[1] * invScale, 0.0f),
+                                      glm::vec4(invRot[2] * invScale, 0.0f),
+                                      glm::vec4(invTrans, 1.0f));
+
+    // Local Ray
+    Ray localRay;
+    localRay.origin = glm::vec3(basisChange * glm::vec4(ray.origin, 1.0f));
+    localRay.direction = glm::normalize(basisChange * glm::vec4(ray.direction, 0.0f));
+
+    // INTERSECTION
 
     // Variables
     float crntDist = 0.0f;
@@ -152,7 +223,7 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle)
     for (int i = 0; i < maxSteps; i++)
     {
         // POINT CALCULATION
-        glm::vec3 point = ray.origin + ray.direction * crntDist;
+        glm::vec3 point = localRay.origin + localRay.direction * crntDist;
 
         // SDF
         // Edges
@@ -199,7 +270,8 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle)
             hitInfo.mat.ior = triangle.ior;
             hitInfo.mat.emissive = triangle.emissive;
             hitInfo.point = point;
-            hitInfo.normal = norm;
+            hitInfo.normal = glm::normalize(rot * norm);
+
             return hitInfo;
         }
 
@@ -216,10 +288,81 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle)
 }
 
 // PLANE INTERSECTION
-HitInfo Intersect::intersectPlane(Ray ray, Plane plane)
+HitInfo Intersect::intersectPlane(Ray ray, Plane plane, std::vector<xForm> xFormArray)
 {
-    // Instantiate Struct
+    // TRANSFORMS
+    // Variables
     HitInfo hitInfo;
+
+    int crntIndx = plane.objID;
+    int prntIndx = -1;
+
+    // Matrices
+    glm::mat4 crntTrn;
+    glm::mat4 localTrn = glm::mat4(1.0f);
+    glm::mat4 prntTrn;
+    glm::mat4 idntMat = glm::mat4(1.0f); // dont alter last row (affine)
+    prntTrn = idntMat;
+
+    // Object Indices / Parent Indices
+    for (int i = 0; i < xFormArray.size(); i++)
+    {
+        // Check For Current Index
+        if (xFormArray[i].crntID == crntIndx)
+        {
+            localTrn = xFormArray[i].transform;
+            prntIndx = xFormArray[i].prntID; // set parent index
+            break;
+        }
+    }
+
+    // Global Parent Check
+    bool prntFound = false;
+    while (prntIndx != -1) // loop until global parent
+    {
+        for (int i = 0; i < xFormArray.size(); i++)
+        {
+            if (xFormArray[i].crntID == prntIndx)
+            {
+                prntTrn = xFormArray[i].transform * prntTrn; // combine the parent transforms
+                prntIndx = xFormArray[i].prntID;             // go to next parent
+                prntFound = true;
+                break;
+            }
+        }
+
+        if (!prntFound)
+            break;
+    }
+
+    // Matrix Multiplication
+    crntTrn = prntTrn * localTrn;
+
+    // Scale
+    float scale = glm::length(glm::vec3(crntTrn[0]));
+    float invScale = 1.0f / scale; // gets local scale (shrink ray instead of enlarge shape)
+
+    // Rotation (Grab Rotation Matrix Vals)
+    glm::mat3 rot = glm::mat3(crntTrn) * invScale; // grabs rotation values and purges scale
+    glm::mat3 invRot = glm::transpose(rot);
+
+    // Translation
+    glm::vec3 trans = glm::vec3(crntTrn[3]);
+    glm::vec3 invTrans = -(invRot * trans);
+
+    // FRAME CHANGE (Global to Local)
+    // Basis Change
+    glm::mat4 basisChange = glm::mat4(glm::vec4(invRot[0] * invScale, 0.0f),
+                                      glm::vec4(invRot[1] * invScale, 0.0f),
+                                      glm::vec4(invRot[2] * invScale, 0.0f),
+                                      glm::vec4(invTrans, 1.0f));
+
+    // Local Ray
+    Ray localRay;
+    localRay.origin = glm::vec3(basisChange * glm::vec4(ray.origin, 1.0f));
+    localRay.direction = glm::normalize(basisChange * glm::vec4(ray.direction, 0.0f));
+
+    // INTERSECTION
 
     // Variables
     float crntDist = 0.0f;
@@ -231,7 +374,7 @@ HitInfo Intersect::intersectPlane(Ray ray, Plane plane)
     for (int i = 0; i < maxSteps; i++)
     {
         // CALCULATIONS
-        glm::vec3 point = ray.origin + ray.direction * crntDist;
+        glm::vec3 point = localRay.origin + localRay.direction * crntDist;
         float sdf = glm::abs(glm::dot((point - plane.position), plane.normal)); // signed distance function (distance from current position to object)
 
         // INTERSECT CHECKS
@@ -246,7 +389,8 @@ HitInfo Intersect::intersectPlane(Ray ray, Plane plane)
             hitInfo.mat.ior = plane.ior;
             hitInfo.mat.emissive = plane.emissive;
             hitInfo.point = point;
-            hitInfo.normal = plane.normal;
+            hitInfo.normal = glm::normalize(rot * plane.normal);
+
             return hitInfo;
         }
 

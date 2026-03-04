@@ -80,6 +80,6 @@ public:
 
     // FUNCTION SIGNATURES
     HitInfo intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xFormArray);
-    HitInfo intersectTriangle(Ray ray, Triangle triangle);
-    HitInfo intersectPlane(Ray ray, Plane plane);
+    HitInfo intersectTriangle(Ray ray, Triangle triangle, std::vector<xForm> xFormArray);
+    HitInfo intersectPlane(Ray ray, Plane plane, std::vector<xForm> xFormArray);
 };

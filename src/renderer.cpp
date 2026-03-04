@@ -3,6 +3,7 @@
 #include <fstream>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
+#include "omp.h"
 
 // HELPER FUNCTIONS
 // Fresnel Reflectance
@@ -69,8 +70,10 @@ glm::vec3 Renderer::BRDF(glm::vec3 R, HitInfo hitInfo, glm::vec3 w0, glm::vec3 w
 void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
 {
     camera.camViewUpdate();
-    // FRAME BUFFER
-    // Loop Through Pixel Rows (Preserves i and j pixels)
+
+// FRAME BUFFER W/ PARALLELIZATION
+// Loop Through Pixel Rows (Preserves i and j pixels)
+#pragma omp parallel for                // creates threads to run portions of the loop in parallel
     for (int j = 0; j < resHeight; j++) // render all pixels
     {
         for (int i = 0; i < resWidth; i++)
@@ -120,7 +123,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     // Check For Plane
     for (i = 0; i < planes.size(); i++)
     {
-        tempHit = intersect.intersectPlane(ray, planes[i]);
+        tempHit = intersect.intersectPlane(ray, planes[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -130,7 +133,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     // Check For Triangle
     for (i = 0; i < triangles.size(); i++)
     {
-        tempHit = intersect.intersectTriangle(ray, triangles[i]);
+        tempHit = intersect.intersectTriangle(ray, triangles[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -182,7 +185,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // Triangle
         for (i = 0; i < triangles.size(); i++)
         {
-            shadowHit = intersect.intersectTriangle(shadowRay, triangles[i]);
+            shadowHit = intersect.intersectTriangle(shadowRay, triangles[i], xForms);
             if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
                 inShadow = true;
         }
@@ -190,7 +193,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // Plane
         for (i = 0; i < planes.size(); i++)
         {
-            shadowHit = intersect.intersectPlane(shadowRay, planes[i]);
+            shadowHit = intersect.intersectPlane(shadowRay, planes[i], xForms);
             if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
                 inShadow = true;
         }
