@@ -352,9 +352,9 @@ void Renderer::loadScene(const std::string &filename)
         {
             Intersect::Triangle newTriangle;
             // Shape Stats
-            file >> newTriangle.a.x >> newTriangle.a.y >> newTriangle.a.z;
-            file >> newTriangle.b.x >> newTriangle.b.y >> newTriangle.b.z;
-            file >> newTriangle.c.x >> newTriangle.c.y >> newTriangle.c.z;
+            file >> newTriangle.p0.x >> newTriangle.p0.y >> newTriangle.p0.z;
+            file >> newTriangle.p1.x >> newTriangle.p1.y >> newTriangle.p1.z;
+            file >> newTriangle.p2.x >> newTriangle.p2.y >> newTriangle.p2.z;
             // Material Stats
             file >> newTriangle.albedo.r >> newTriangle.albedo.g >> newTriangle.albedo.b;
             file >> newTriangle.metallic >> newTriangle.roughness >> newTriangle.ior >> newTriangle.emissive;

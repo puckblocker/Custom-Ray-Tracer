@@ -54,9 +54,9 @@ public:
     // TRIANGLE
     struct Triangle
     {
-        glm::vec3 a;
-        glm::vec3 b;
-        glm::vec3 c;
+        glm::vec3 p0;
+        glm::vec3 p1;
+        glm::vec3 p2;
         unsigned int objID;
         glm::vec3 albedo;
         float roughness;
