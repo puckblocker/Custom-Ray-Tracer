@@ -373,6 +373,7 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle, std::vector<xFo
     if (glm::abs(a) < 0.0001)
     {
         hitInfo.valid = false;
+        return hitInfo;
     }
 
     float f = 1.0f / a;
@@ -402,7 +403,8 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle, std::vector<xFo
     if (t > 0.0001) // epsilon prevent self-intersection
     {
         // Fill Hit Info Traits
-        glm::vec3 point = localRay.origin + localRay.direction * t;     // calculate point
+        glm::vec3 localPoint = localRay.origin + localRay.direction * t; // calculate point
+        hitInfo.point = glm::vec3(crntTrn * glm::vec4(localPoint, 1.0f));
         glm::vec3 localNorm = glm::normalize(glm::cross(edge1, edge2)); // calculate normal
         hitInfo.normal = glm::normalize(rot * localNorm);
         hitInfo.valid = true;
@@ -413,7 +415,6 @@ HitInfo Intersect::intersectTriangle(Ray ray, Triangle triangle, std::vector<xFo
         hitInfo.mat.metallic = triangle.metallic;
         hitInfo.mat.ior = triangle.ior;
         hitInfo.mat.emissive = triangle.emissive;
-        hitInfo.point = point;
 
         return hitInfo;
     }

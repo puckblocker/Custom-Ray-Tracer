@@ -36,5 +36,8 @@ Ray Camera::rayGeneration(unsigned i, unsigned j)
     // Find Ray Direction
     ray.direction = glm::normalize(pixelPos - origin); // Calculated by geting normalized unit of the vector between ray origin and camera origin
 
+    // Get a Random Time (Motion Blur)
+    ray.time = rand() / (RAND_MAX + 1.0f);
+
     return ray;
 }
