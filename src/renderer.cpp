@@ -338,6 +338,7 @@ void Renderer::loadScene(const std::string &filename)
             // Material Stats
             file >> newSphere.albedo.r >> newSphere.albedo.g >> newSphere.albedo.b;
             file >> newSphere.metallic >> newSphere.roughness >> newSphere.ior >> newSphere.emissive;
+            file >> newSphere.animated;
             objID += 1;
             newSphere.objID = objID;
 

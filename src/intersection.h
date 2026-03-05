@@ -49,6 +49,7 @@ public:
         bool metallic;
         float ior;
         float emissive;
+        bool animated;
     };
 
     // TRIANGLE
@@ -63,6 +64,7 @@ public:
         float metallic;
         float ior;
         float emissive;
+        bool animated = false;
     };
 
     // PLANE
@@ -76,6 +78,7 @@ public:
         float metallic;
         float ior;
         float emissive;
+        bool animated = false;
     };
 
     // FUNCTION SIGNATURES

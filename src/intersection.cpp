@@ -98,6 +98,14 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xF
         raySign = 1.0f;
     }
 
+    // MOTION BLUR (Move Sphere Based on Time)
+    float velocity = 1.0f;
+
+    if (sphere.animated == true)
+    {
+        sphere.center += ray.time * velocity;
+    }
+
     // Ray Marching
     for (int i = 0; i < maxSteps; i++)
     {
