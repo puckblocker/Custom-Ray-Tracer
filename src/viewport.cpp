@@ -17,6 +17,9 @@ void Camera::camViewUpdate()
     glm::vec3 viewportCenter = origin + (length * gaze);
     viewport.origin = viewportCenter - 0.5f * (viewport.width * orthoU) - 0.5f * (viewport.height * orthoUp);
 
+    // Lens Distance Calculations
+    focalDist = 0.5f * focusDist;
+
     // Pixel Calculations
     image.pixelHeight = viewport.height / image.height;
     image.pixelWidth = viewport.width / image.width;
@@ -35,16 +38,37 @@ Ray Camera::rayGeneration(float i, float j)
     // Jitter The Pixel
     glm::vec2 jitter = glm::vec2(rand() / (RAND_MAX + 1.0f), rand() / (RAND_MAX + 1.0f)); // randomize the sample position
 
-    // Find the Ray Origin // TEST PIXEL OFFSET of .5 <-
-    // ray.origin = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) + (((float)j + 0.5f) * image.pixelHeight * basis.yhat); // Calculated through the our basis and pixel dimensions
+    // Find Ray Direction (Pinhole)
     glm::vec3 pixelPos = viewport.origin + (((float)i + jitter.x) * image.pixelWidth * basis.xhat) +
                          (((float)j + jitter.y) * image.pixelHeight * basis.yhat);
-    ray.origin = origin; // moves ray origin back to camera origin
-    // Find Ray Direction
     ray.direction = glm::normalize(pixelPos - origin); // Calculated by geting normalized unit of the vector between ray origin and camera origin
+
+    // DEPTH OF FIELD CALCUlATIONS (Lens)
+    glm::vec3 focalPoint = origin + (ray.direction * focusDist); // focal point from the focus point and the focus distance
+    glm::vec3 lensSample = lensRandom() * (lensDiameter / 2.0f); // grab random value within the lens radius
+
+    // Ray Origin
+    ray.origin = origin + (lensSample.x * basis.xhat) + (lensSample.y * basis.yhat); // moves ray origin back to camera origin
+
+    // Ray Direction
+    ray.direction = glm::normalize(focalPoint - ray.origin);
 
     // Get a Random Time (Motion Blur)
     ray.time = rand() / (RAND_MAX + 1.0f);
 
     return ray;
+}
+
+// Random Point On Lens
+glm::vec3 Camera::lensRandom()
+{
+    while (1)
+    {
+        // Generate Random Point Within -1 and 1
+        glm::vec3 point = glm::vec3(rand() / (RAND_MAX + 1.0f) * 2.0f - 1.0f, rand() / (RAND_MAX + 1.0f) * 2.0f - 1.0f, 0.0f);
+
+        // Check For Point Inside Lens
+        if (glm::length2(point) < 1.0f)
+            return point;
+    }
 }

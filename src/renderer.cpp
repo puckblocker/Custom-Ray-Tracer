@@ -424,6 +424,12 @@ void Renderer::loadScene(const std::string &filename)
             file >> camera.viewport.height >> camera.viewport.width;
         }
 
+        else if (type == "Lens")
+        {
+            file >> camera.lensDiameter >> camera.focusDist;
+            std::cout << "Lens diameter: " << camera.lensDiameter << std::endl;
+        }
+
         else if (type == "Transform")
         {
             // Variables

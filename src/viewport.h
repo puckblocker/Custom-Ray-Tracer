@@ -1,6 +1,8 @@
 #pragma once // Ensures header file only include once throughout program
 
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
 
 #include "rayData.h"
 
@@ -12,6 +14,9 @@ public:
     glm::vec3 up = glm::vec3(0.0f);     // vertical orientation
     glm::vec3 gaze = glm::vec3(0.0f);   // direction camera is facing
     float length;                       // distance from viewport center to camera
+    float lensDiameter;                 // size of camera lens (user provided)
+    float focusDist;                    // camera focus distance (user provided)
+    float focalDist;                    // camera focal distance
 
     // Viewport
     struct Viewport
@@ -46,4 +51,5 @@ public:
     // FUNCTION SIGNATURES
     Ray rayGeneration(float i, float j);
     void camViewUpdate();
+    glm::vec3 lensRandom();
 };
