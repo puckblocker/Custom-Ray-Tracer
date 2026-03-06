@@ -23,15 +23,22 @@ void Camera::camViewUpdate()
 }
 
 // Ray Generation
-Ray Camera::rayGeneration(unsigned i, unsigned j)
+Ray Camera::rayGeneration(float i, float j)
 {
     // Instantiate struct
     Ray ray;
 
+    // Pixel Sample
+    glm::vec3 smpleSqr = glm::vec3(rand() / (RAND_MAX + 1.0f) - 0.5f, rand() / (RAND_MAX + 1.0f) - 0.5f, 0.0f); // random point in sample area
+    glm::vec3 pixelOffset = smpleSqr;
+
+    // Jitter The Pixel
+    glm::vec2 jitter = glm::vec2(rand() / (RAND_MAX + 1.0f), rand() / (RAND_MAX + 1.0f)); // randomize the sample position
+
     // Find the Ray Origin // TEST PIXEL OFFSET of .5 <-
     // ray.origin = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) + (((float)j + 0.5f) * image.pixelHeight * basis.yhat); // Calculated through the our basis and pixel dimensions
-    glm::vec3 pixelPos = viewport.origin + (((float)i + 0.5f) * image.pixelWidth * basis.xhat) +
-                         (((float)j + 0.5f) * image.pixelHeight * basis.yhat);
+    glm::vec3 pixelPos = viewport.origin + (((float)i + jitter.x) * image.pixelWidth * basis.xhat) +
+                         (((float)j + jitter.y) * image.pixelHeight * basis.yhat);
     ray.origin = origin; // moves ray origin back to camera origin
     // Find Ray Direction
     ray.direction = glm::normalize(pixelPos - origin); // Calculated by geting normalized unit of the vector between ray origin and camera origin

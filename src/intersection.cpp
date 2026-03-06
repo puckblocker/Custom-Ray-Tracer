@@ -99,7 +99,7 @@ HitInfo Intersect::intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xF
     }
 
     // MOTION BLUR (Move Sphere Based on Time)
-    float velocity = 1.0f;
+    float velocity = 0.10f;
 
     if (sphere.animated == true)
     {

@@ -78,11 +78,27 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
     {
         for (int i = 0; i < resWidth; i++)
         {
-            // Generate Ray
-            Ray ray = camera.rayGeneration(i, j);
+            // ANTI-ALIASING (Multiple Rays)
+            // Varaibles
+            Ray ray;
+            glm::vec3 color(0.0f);
 
-            // Call Tracer
-            glm::vec3 color = tracer(ray, 0);
+            int smpleAmnt = 8;                   // samples per pixel
+            double smpleScale = 1.0 / smpleAmnt; // color scale factor
+
+            // Loop For Amount of Samples
+            for (int sample = 0; sample < smpleAmnt; sample++)
+            {
+                // Generate Ray
+                ray = camera.rayGeneration(i, j);
+
+                // Call Tracer
+                color += tracer(ray, 0);
+            }
+            // float r = color.x;
+            // float g = color.y;
+            // float b = color.z;
+            color *= smpleScale;
 
             // Grab RGB Components
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels

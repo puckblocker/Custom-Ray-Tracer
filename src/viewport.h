@@ -44,6 +44,6 @@ public:
     Basis basis;
 
     // FUNCTION SIGNATURES
-    Ray rayGeneration(unsigned i, unsigned j);
+    Ray rayGeneration(float i, float j);
     void camViewUpdate();
 };
