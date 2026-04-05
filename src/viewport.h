@@ -5,6 +5,7 @@
 #include <glm/gtx/norm.hpp>
 
 #include "rayData.h"
+#include "helper.h"
 
 class Camera
 {

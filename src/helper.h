@@ -1,11 +1,11 @@
 // Helper Functions
 #pragma once
 
+#include <random>
 #include "intersection.h"
 
-class Help
+namespace Help
 {
-public:
     // Random Number Generator
     float RandFloat();
 
@@ -20,4 +20,4 @@ public:
 
     // PBR BRDF CALCULATIONS (DIRECT LIGHTING)
     glm::vec3 BRDF(glm::vec3 R, HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi);
-};
+}

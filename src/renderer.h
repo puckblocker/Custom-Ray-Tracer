@@ -8,6 +8,7 @@
 #include "intersection.h"
 #include "lighting.h"
 #include "viewport.h"
+#include "helper.h"
 
 class Renderer
 {
