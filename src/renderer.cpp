@@ -5,6 +5,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include "omp.h"
 
+using namespace Intersect;
+
 // RENDER
 void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
 {
@@ -63,7 +65,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     int i = 0;
     for (i = 0; i < spheres.size(); i++)
     {
-        tempHit = intersect.intersectSphere(ray, spheres[i], xForms);
+        tempHit = intersectSphere(ray, spheres[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -73,7 +75,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     // Check For Plane
     for (i = 0; i < planes.size(); i++)
     {
-        tempHit = intersect.intersectPlane(ray, planes[i], xForms);
+        tempHit = intersectPlane(ray, planes[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -83,7 +85,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     // Check For Triangle
     for (i = 0; i < triangles.size(); i++)
     {
-        tempHit = intersect.intersectTriangle(ray, triangles[i], xForms);
+        tempHit = intersectTriangle(ray, triangles[i], xForms);
         if (tempHit.valid && tempHit.distance < hitInfo.distance)
         {
             hitInfo = tempHit;
@@ -127,7 +129,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // HitInfo shadowHit;
         // for (i = 0; i < spheres.size(); i++)
         // {
-        //     shadowHit = intersect.intersectSphere(shadowRay, spheres[i], xForms);
+        //     shadowHit = intersectSphere(shadowRay, spheres[i], xForms);
         //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID) // Check for hit and behind object
         //         inShadow = true;
         // }
@@ -135,7 +137,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // // Triangle
         // for (i = 0; i < triangles.size(); i++)
         // {
-        //     shadowHit = intersect.intersectTriangle(shadowRay, triangles[i], xForms);
+        //     shadowHit = intersectTriangle(shadowRay, triangles[i], xForms);
         //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
         //         inShadow = true;
         // }
@@ -143,7 +145,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // // Plane
         // for (i = 0; i < planes.size(); i++)
         // {
-        //     shadowHit = intersect.intersectPlane(shadowRay, planes[i], xForms);
+        //     shadowHit = intersectPlane(shadowRay, planes[i], xForms);
         //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
         //         inShadow = true;
         // }

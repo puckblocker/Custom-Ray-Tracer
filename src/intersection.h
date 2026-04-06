@@ -27,9 +27,8 @@ struct HitInfo
     Material mat;
 };
 
-class Intersect
+namespace Intersect
 {
-public:
     // Info On Transforms
     struct xForm
     {
@@ -38,50 +37,48 @@ public:
         glm::mat4 transform; // matrix transforms
     };
 
+    struct LocalSpaceData
+    {
+        Ray localRay;
+        glm::mat4 wrldToLocal;
+        glm::mat3 nrmMtrx;
+    };
+
+    // Parent Class
+    struct Shape
+    {
+        unsigned int objID;
+        glm::vec3 albedo;
+        float roughness;
+        float metallic;
+        float ior;
+        float emissive;
+        bool animated = false;
+    };
+
+    // Children
     // SPHERE
-    struct Sphere
+    struct Sphere : public Shape
     {
         float radius;
         glm::vec3 center;
-        unsigned int objID;
-        glm::vec3 albedo;
-        float roughness;
-        bool metallic;
-        float ior;
-        float emissive;
-        bool animated;
     };
 
     // TRIANGLE
-    struct Triangle
+    struct Triangle : public Shape
     {
-        glm::vec3 p0;
-        glm::vec3 p1;
-        glm::vec3 p2;
-        unsigned int objID;
-        glm::vec3 albedo;
-        float roughness;
-        float metallic;
-        float ior;
-        float emissive;
-        bool animated = false;
+        glm::vec3 p0, p1, p2;
     };
 
     // PLANE
-    struct Plane
+    struct Plane : public Shape
     {
         glm::vec3 position;
         glm::vec3 normal;
-        unsigned int objID;
-        glm::vec3 albedo;
-        float roughness;
-        float metallic;
-        float ior;
-        float emissive;
-        bool animated = false;
     };
 
     // FUNCTION SIGNATURES
+    LocalSpaceData localSpacePrep(Ray ray, const Shape &shape, const std::vector<xForm> &xFormArray);
     HitInfo intersectSphere(Ray ray, Sphere sphere, std::vector<xForm> xFormArray);
     HitInfo intersectTriangle(Ray ray, Triangle triangle, std::vector<xForm> xFormArray);
     HitInfo intersectPlane(Ray ray, Plane plane, std::vector<xForm> xFormArray);

@@ -14,7 +14,6 @@ class Renderer
 {
 public:
     // VARIABLES
-    Intersect intersect;
     Light light;
     Camera camera;
 
