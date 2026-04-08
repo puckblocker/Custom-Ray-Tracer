@@ -189,6 +189,18 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         wi.y = glm::sin(2 * pi * xi1) * glm::sqrt(1 - xi0 * xi0);
         wi.z = xi0;
 
+        // Convert wi To World Space
+        // Axis Calculation
+        glm::vec3 normUp = (abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
+        glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
+        glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
+
+        // Rotation Matrix
+        glm::mat3 localSpace = glm::mat3(orthoU, orthoUp, hitInfo.normal);
+
+        // Rotate Into World Space
+        wi = glm::normalize(localSpace * wi);
+
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;

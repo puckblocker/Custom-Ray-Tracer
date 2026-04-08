@@ -60,7 +60,9 @@ namespace Help
         float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
 
         // Rough Specular BRDF
-        glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, w0)) / (4.0f * glm::dot(hitInfo.normal, w0) * glm::dot(hitInfo.normal, wi));
+        float nDotw0 = dot(hitInfo.normal, w0);
+        float nDotwi = dot(hitInfo.normal, wi);
+        glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, w0)) / (4.0f * nDotw0 * nDotwi);
 
         // PBR BRDF RESULT (Direct Lighting)
         glm::vec3 directLighting = idealDiffuse + roughSpec;
