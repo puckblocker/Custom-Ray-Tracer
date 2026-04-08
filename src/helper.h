@@ -6,6 +6,8 @@
 
 namespace Help
 {
+    constexpr float pi = 3.14159265359f;
+
     // Random Number Generator
     float RandFloat();
 

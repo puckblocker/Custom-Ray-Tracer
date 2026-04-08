@@ -5,7 +5,7 @@ namespace Help
     // Random Number Generator
     float RandFloat()
     {
-        return rand() / (RAND_MAX + 1.0f);
+        return (rand() / (RAND_MAX + 1.0f));
     }
 
     // Fresnel Reflectance

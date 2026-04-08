@@ -6,6 +6,7 @@
 #include "omp.h"
 
 using namespace Intersect;
+using namespace Help;
 
 // RENDER
 void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
@@ -22,12 +23,12 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             // ANTI-ALIASING (Multiple Rays)
             // Varaibles
             Ray ray;
+
             glm::vec3 color(0.0f);
+            int smpleAmnt = 16; // samples per pixel
 
-            int smpleAmnt = 8; // samples per pixel
-
-            // Generate Jittered Rays
-            for (int i = 0; i < smpleAmnt; i++)
+            // Generate Jittered Rays (Jitter Happens Inside Ray)
+            for (int index = 0; index < smpleAmnt; index++)
             {
                 // Generate Ray
                 ray = camera.rayGeneration(i, j);
@@ -35,6 +36,9 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
                 // Call Tracer
                 color += tracer(ray, 0);
             }
+
+            // Average Radiance Calculation (Monte Carlo)
+            color = color / float(smpleAmnt);
 
             // Grab RGB Components
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
@@ -92,8 +96,8 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         }
     }
 
-    // Generate Light
-    if (hitInfo.valid)
+    // Non Light Hit
+    if (hitInfo.valid && hitInfo.mat.emissive == false)
     {
         // // Shadow Variables
         // glm::vec3 toLight; // = pointLight.origin - hitInfo.point;
@@ -168,12 +172,58 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // color += specCoeff;
 
+        // PATH TRACING SECTION (Not to self: DELETE COMMENT)
+        // HEMISPHERE SAMPLING
+        // Variables
+        float xi0 = RandFloat();
+        float xi1 = RandFloat();
+        float xi2 = RandFloat();
+
+        // Azimuthal & Polar Angles
+        float theta = glm::acos(xi0);
+        float phi = 2 * pi * xi1;
+
+        // Spherical to Cartesian Conversion
+        glm::vec3 wi;
+        wi.x = glm::cos(2 * pi * xi1) * glm::sqrt(1 - xi0 * xi0);
+        wi.y = glm::sin(2 * pi * xi1) * glm::sqrt(1 - xi0 * xi0);
+        wi.z = xi0;
+
+        // COLOR / REFLECTANCE (BRDF)
+        glm::vec3 R = hitInfo.mat.albedo;
+        glm::vec3 w0 = -ray.direction;
+        glm::vec3 rflct = BRDF(R, hitInfo, w0, wi);
+
+        // PDF / PROBABILITY
+        // Sampling and Direction Probability
+        float pw = 1.0f / (2.0f * pi);
+
+        // INDIRECT LIGHT
+        Ray bounceRay;
+        bounceRay.direction = wi;
+        bounceRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+
+        // Indirect Light Calculation
+        glm::vec3 Li = tracer(bounceRay, depth + 1);
+
+        color += ((rflct * glm::cos(theta)) / pw) * Li;
+
         return color;
     }
+    // Direct Light Hit
+    else if (hitInfo.valid && hitInfo.mat.emissive == true)
+    {
+        // Return Emission
+        return hitInfo.mat.albedo;
+    }
+    // Exited Scene
     else
     {
         // Set Sky Color
-        return glm::vec3(0.69f, 0.88f, 1.0f);
+        // return glm::vec3(0.69f, 0.88f, 1.0f);
+
+        // Add Emission From All Infinite Lights
+        return directionalLight.color;
     }
 }
 

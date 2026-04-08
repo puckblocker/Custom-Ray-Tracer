@@ -14,6 +14,7 @@ add_executable(ray_tracer
     src/lighting.cpp
     src/renderer.cpp
     src/viewport.cpp 
+    src/helper.cpp
     src/glad.c)
 
 # Located Header Files

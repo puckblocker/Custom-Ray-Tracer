@@ -26,10 +26,6 @@ public:
     Light::dLight directionalLight;
 
     // FUNCTION SIGNATURES
-    glm::vec3 FrsRflct(glm::vec3 normal, glm::vec3 direction, glm::vec3 F0);
-    float DistrFunc(float alphaSqr, glm::vec3 normal, glm::vec3 wh);
-    float GeomFunc(float k, glm::vec3 normal, glm::vec3 w0, glm::vec3 wi);
-    glm::vec3 BRDF(glm::vec3 R, HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi);
     void render(float *pixelBuffer, int resWidth, int resHeight);
     glm::vec3 tracer(Ray ray, unsigned int depth);
     void loadScene(const std::string &filename);
