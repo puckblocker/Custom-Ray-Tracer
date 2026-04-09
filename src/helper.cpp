@@ -5,7 +5,19 @@ namespace Help
     // Random Number Generator
     float RandFloat()
     {
-        return (rand() / (RAND_MAX + 1.0f));
+        // return (rand() / (RAND_MAX + 1.0f));
+
+        // Generate Seed With Hardware Entropy
+        std::random_device r;
+
+        // Number Range
+        std::uniform_real_distribution<float> distr(0, 1);
+
+        // Generate Normal Distribution
+        std::mt19937 gen(r());
+
+        // Generate Random Number
+        return distr(gen);
     }
 
     // Fresnel Reflectance
@@ -62,7 +74,7 @@ namespace Help
         // Rough Specular BRDF
         float nDotw0 = dot(hitInfo.normal, w0);
         float nDotwi = dot(hitInfo.normal, wi);
-        glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, w0)) / (4.0f * nDotw0 * nDotwi);
+        glm::vec3 roughSpec = (D * G * FrsRflct(hitInfo.normal, wh, F0)) / (4.0f * nDotw0 * nDotwi);
 
         // PBR BRDF RESULT (Direct Lighting)
         glm::vec3 directLighting = idealDiffuse + roughSpec;

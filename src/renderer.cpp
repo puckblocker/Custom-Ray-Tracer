@@ -34,7 +34,16 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
                 ray = camera.rayGeneration(i, j);
 
                 // Call Tracer
-                color += tracer(ray, 0);
+                glm::vec3 sampleColor = tracer(ray, 0);
+
+                // NaN Check
+                if (glm::any(glm::isnan(sampleColor)))
+                {
+                }
+                else
+                {
+                    color += sampleColor;
+                }
             }
 
             // Average Radiance Calculation (Monte Carlo)
@@ -175,19 +184,52 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // PATH TRACING SECTION (Not to self: DELETE COMMENT)
         // HEMISPHERE SAMPLING
         // Variables
-        float xi0 = RandFloat();
-        float xi1 = RandFloat();
-        float xi2 = RandFloat();
+        // float xi0 = RandFloat();
+        // float xi1 = RandFloat();
+        // float xi2 = RandFloat();
 
-        // Azimuthal & Polar Angles
-        float theta = glm::acos(xi0);
-        float phi = 2 * pi * xi1;
+        // // Azimuthal & Polar Angles
+        // float theta = glm::acos(xi0);
+        // float phi = 2 * pi * xi1;
 
-        // Spherical to Cartesian Conversion
+        // COS WEIGHTED UIT HEMISPHERE SAMPLING (IMPORTANCE SAMPLING)
+        // Random Variables
+        float Xi0 = RandFloat();
+        float Xi1 = RandFloat();
+
+        // Uniform Disc Sample
+        float dXi0 = 2 * Xi0 - 1.0f;
+        float dXi1 = 2 * Xi1 - 1.0f;
+        float r;
+        float theta;
+
+        // Prevent Division By Zero
+        if (dXi0 == 0 && dXi1 == 0)
+        {
+            r = 0.0f;
+            theta = 0.0f;
+        }
+
+        else if (glm::abs(dXi0) > glm::abs(dXi1))
+        {
+            theta = (pi / (4.0f)) * (dXi1 / dXi0);
+            r = dXi0;
+        }
+        else
+        {
+            theta = (pi / (2.0f)) - (pi / (4.0f)) * (dXi0 / dXi1);
+            r = dXi1;
+        }
+
+        // Project Point Onto Hemisphere
         glm::vec3 wi;
-        wi.x = glm::cos(2 * pi * xi1) * glm::sqrt(1 - xi0 * xi0);
-        wi.y = glm::sin(2 * pi * xi1) * glm::sqrt(1 - xi0 * xi0);
-        wi.z = xi0;
+        wi.x = r * glm::cos(theta);
+        wi.y = r * glm::sin(theta);
+        wi.z = glm::sqrt(1 - r * r);
+
+        // PDF / PROBABILITY
+        // Sampling and Direction Probability (Cosine Weighted)
+        float pw = glm::cos(theta) / pi;
 
         // Convert wi To World Space
         // Axis Calculation
@@ -206,10 +248,6 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         glm::vec3 w0 = -ray.direction;
         glm::vec3 rflct = BRDF(R, hitInfo, w0, wi);
 
-        // PDF / PROBABILITY
-        // Sampling and Direction Probability
-        float pw = 1.0f / (2.0f * pi);
-
         // INDIRECT LIGHT
         Ray bounceRay;
         bounceRay.direction = wi;
@@ -218,7 +256,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // Indirect Light Calculation
         glm::vec3 Li = tracer(bounceRay, depth + 1);
 
-        color += ((rflct * glm::cos(theta)) / pw) * Li;
+        color += (rflct * pi) * Li;
 
         return color;
     }
