@@ -25,7 +25,7 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 16; // samples per pixel
+            int smpleAmnt = 1024; // samples per pixel
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
@@ -192,71 +192,74 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // float theta = glm::acos(xi0);
         // float phi = 2 * pi * xi1;
 
-        // COS WEIGHTED UIT HEMISPHERE SAMPLING (IMPORTANCE SAMPLING)
-        // Random Variables
-        float Xi0 = RandFloat();
-        float Xi1 = RandFloat();
+        // // COS WEIGHTED UIT HEMISPHERE SAMPLING (IMPORTANCE SAMPLING)
+        // // Random Variables
+        // float Xi0 = RandFloat();
+        // float Xi1 = RandFloat();
 
-        // Uniform Disc Sample
-        float dXi0 = 2 * Xi0 - 1.0f;
-        float dXi1 = 2 * Xi1 - 1.0f;
-        float r;
-        float theta;
+        // // Uniform Disc Sample
+        // float dXi0 = 2 * Xi0 - 1.0f;
+        // float dXi1 = 2 * Xi1 - 1.0f;
+        // float r;
+        // float theta;
 
-        // Prevent Division By Zero
-        if (dXi0 == 0 && dXi1 == 0)
-        {
-            r = 0.0f;
-            theta = 0.0f;
-        }
+        // // Prevent Division By Zero
+        // if (dXi0 == 0 && dXi1 == 0)
+        // {
+        //     r = 0.0f;
+        //     theta = 0.0f;
+        // }
 
-        else if (glm::abs(dXi0) > glm::abs(dXi1))
-        {
-            theta = (pi / (4.0f)) * (dXi1 / dXi0);
-            r = dXi0;
-        }
-        else
-        {
-            theta = (pi / (2.0f)) - (pi / (4.0f)) * (dXi0 / dXi1);
-            r = dXi1;
-        }
+        // else if (glm::abs(dXi0) > glm::abs(dXi1))
+        // {
+        //     theta = (pi / (4.0f)) * (dXi1 / dXi0);
+        //     r = dXi0;
+        // }
+        // else
+        // {
+        //     theta = (pi / (2.0f)) - (pi / (4.0f)) * (dXi0 / dXi1);
+        //     r = dXi1;
+        // }
 
-        // Project Point Onto Hemisphere
+        // // Project Point Onto Hemisphere
+        // glm::vec3 wi;
+        // wi.x = r * glm::cos(theta);
+        // wi.y = r * glm::sin(theta);
+        // wi.z = glm::sqrt(1 - r * r);
+
+        // // PDF / PROBABILITY
+        // // Sampling and Direction Probability (Cosine Weighted)
+        // float pw = glm::cos(theta) / pi;
+
+        // // Convert wi To World Space
+        // // Axis Calculation
+        // glm::vec3 normUp = (abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
+        // glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
+        // glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
+
+        // // Rotation Matrix
+        // glm::mat3 localSpace = glm::mat3(orthoU, orthoUp, hitInfo.normal);
+
+        // // Rotate Into World Space
+        // wi = glm::normalize(localSpace * wi);
+
         glm::vec3 wi;
-        wi.x = r * glm::cos(theta);
-        wi.y = r * glm::sin(theta);
-        wi.z = glm::sqrt(1 - r * r);
-
-        // PDF / PROBABILITY
-        // Sampling and Direction Probability (Cosine Weighted)
-        float pw = glm::cos(theta) / pi;
-
-        // Convert wi To World Space
-        // Axis Calculation
-        glm::vec3 normUp = (abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
-        glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
-        glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
-
-        // Rotation Matrix
-        glm::mat3 localSpace = glm::mat3(orthoU, orthoUp, hitInfo.normal);
-
-        // Rotate Into World Space
-        wi = glm::normalize(localSpace * wi);
 
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;
-        glm::vec3 rflct = BRDF(R, hitInfo, w0, wi);
+        glm::vec3 rflct = BSDF(hitInfo, w0, wi);
 
         // INDIRECT LIGHT
         Ray bounceRay;
         bounceRay.direction = wi;
-        bounceRay.origin = hitInfo.point + (hitInfo.normal * 0.001f);
+        bounceRay.origin = hitInfo.point + (wi * 0.001f);
 
         // Indirect Light Calculation
         glm::vec3 Li = tracer(bounceRay, depth + 1);
 
-        color += (rflct * pi) * Li;
+        // color += (rflct * pi) * Li;
+        color += rflct * Li;
 
         return color;
     }
