@@ -8,13 +8,13 @@ namespace Help
         // return (rand() / (RAND_MAX + 1.0f));
 
         // Generate Seed With Hardware Entropy
-        std::random_device r;
+        thread_local std::random_device r;
 
         // Number Range
         std::uniform_real_distribution<float> distr(0, 1);
 
         // Generate Normal Distribution
-        std::mt19937 gen(r());
+        thread_local std::mt19937 gen(r());
 
         // Generate Random Number
         return distr(gen);
@@ -98,7 +98,8 @@ namespace Help
             else if (hitInfo.mat.metallic)
             {
                 // CORRECTED SCHLICK APPROXIMATION
-                F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
+                // F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
+                F0 = albedo;
 
                 wi = glm::reflect(-w0, normal);
 
@@ -164,7 +165,8 @@ namespace Help
             // CORRECT SCHLICK APPROX
             if (hitInfo.mat.metallic)
             {
-                F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
+                // F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
+                F0 = albedo;
             }
 
             // Trowbridge Reitz (Normal Distr Function)
@@ -176,9 +178,9 @@ namespace Help
             float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
 
             // Rough Specular BRDF
-            float nDotwi = dot(hitInfo.normal, wi);
-            float nDotw0 = dot(hitInfo.normal, w0);
-            glm::vec3 Fr = FrsRflct(normal, w0, F0);
+            float nDotwi = glm::max(dot(hitInfo.normal, wi), 0.001f);
+            float nDotw0 = glm::max(dot(hitInfo.normal, w0), 0.001f);
+            glm::vec3 Fr = FrsRflct(wh, w0, F0);
             glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
 
             // Diffuse Lobe (Lambertian)

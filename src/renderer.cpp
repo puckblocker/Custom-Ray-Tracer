@@ -25,7 +25,7 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 1024; // samples per pixel
+            int smpleAmnt = 16; // samples per pixel
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
@@ -253,7 +253,8 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // INDIRECT LIGHT
         Ray bounceRay;
         bounceRay.direction = wi;
-        bounceRay.origin = hitInfo.point + (wi * 0.001f);
+        glm::vec3 normOffset = glm::dot(wi, hitInfo.normal) < 0.0f ? -hitInfo.normal : hitInfo.normal; // prevent self intersection
+        bounceRay.origin = hitInfo.point + (normOffset * 0.002f);
 
         // Indirect Light Calculation
         glm::vec3 Li = tracer(bounceRay, depth + 1);
