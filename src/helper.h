@@ -21,5 +21,5 @@ namespace Help
     float GeomFunc(float k, glm::vec3 normal, glm::vec3 w0, glm::vec3 wi);
 
     // PBR BRDF CALCULATIONS (DIRECT LIGHTING)
-    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi);
+    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf);
 }

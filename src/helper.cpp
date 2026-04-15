@@ -45,7 +45,7 @@ namespace Help
         return G;
     }
 
-    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi)
+    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
         // Variables
         float ior = hitInfo.mat.ior;
@@ -148,7 +148,7 @@ namespace Help
 
             // PDF / PROBABILITY
             // Sampling and Direction Probability (Cosine Weighted)
-            float pw = glm::cos(theta) / pi;
+            // pdf = glm::cos(theta) / pi;
 
             // Convert wi To World Space
             // Axis Calculation
@@ -162,13 +162,6 @@ namespace Help
             // Rotate Into World Space
             wi = glm::normalize(localSpace * wi);
 
-            // CORRECT SCHLICK APPROX
-            if (hitInfo.mat.metallic)
-            {
-                // F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
-                F0 = albedo;
-            }
-
             // Trowbridge Reitz (Normal Distr Function)
             glm::vec3 wh = glm::normalize(0.5f * (w0 + wi));      // half way vector
             float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
@@ -176,19 +169,76 @@ namespace Help
             float k = (alphaSqr + 1.0f) / 8.0f;
             float D = DistrFunc(alphaSqr, hitInfo.normal, wh); // how aligned surface normal is with microfacet normals
             float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
+            float h;
 
-            // Rough Specular BRDF
-            float nDotwi = glm::max(dot(hitInfo.normal, wi), 0.001f);
-            float nDotw0 = glm::max(dot(hitInfo.normal, w0), 0.001f);
-            glm::vec3 Fr = FrsRflct(wh, w0, F0);
-            glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
+            // CORRECT SCHLICK APPROX
+            if (hitInfo.mat.metallic)
+            {
+                // F0 = (glm::pow(ior - 1.0f, 2.0f) + (albedo * albedo)) / (glm::pow(ior + 1.0f, 2.0f) + (albedo * albedo));
+                F0 = albedo;
 
-            // Diffuse Lobe (Lambertian)
-            glm::vec3 kD = (1.0f - Fr) * (1.0f - hitInfo.mat.metallic); // diffuse ratio
-            glm::vec3 diffuse = (kD * albedo) / pi;
+                // GGX SAMPLING
+                float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
+                float alphaSqr = alpha * alpha;
 
-            // PBR BRDF RESULT (Direct Lighting)
-            return (roughSpec + diffuse) * pi;
+                // Random Point In Uniform Disk
+                float phi = 2.0f * pi * Xi0;
+                float cosTheta = glm::sqrt((1.0f - Xi1) / (1.0f + (alphaSqr - 1.0f) * Xi1));
+                float sinTheta = glm::sqrt(glm::max(0.0f, 1.0f - cosTheta * cosTheta));
+
+                wh.x = sinTheta * glm::cos(phi); // random point on x
+                wh.y = sinTheta * glm::sin(phi); // random point on y
+                wh.z = cosTheta;
+
+                // Transform wh Back To Underformed Space Via Orthonormal Basis
+                glm::vec3 normUp = (glm::abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
+                glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
+                glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
+                wh = glm::normalize(orthoU * wh.x + orthoUp * wh.y + hitInfo.normal * wh.z); // local to world transformation
+
+                wi = glm::reflect(-w0, wh); // final outgoing vector (bounce direction)
+
+                // Normal Check
+                if (glm::dot(wi, hitInfo.normal) <= 0.0f)
+                {
+                    return glm::vec3(0.0f);
+                }
+
+                float k = (alphaSqr + 1.0f) / 8.0f;
+                float D = DistrFunc(alphaSqr, hitInfo.normal, wh); // how aligned surface normal is with microfacet normals
+                float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
+
+                float nDotw0 = glm::max(dot(hitInfo.normal, w0), 0.001f);
+                float nDotwi = glm::max(dot(hitInfo.normal, wi), 0.001f);
+                float nDotwh = glm::max(dot(hitInfo.normal, wh), 0.001f);
+                float w0Dotwh = glm::max(dot(w0, wh), 0.001f);
+
+                // PDF
+                pdf = (D * nDotwh) / (4.0f * w0Dotwh);
+                pdf = glm::max(pdf, 0.001f);
+
+                // BRDF Calculations
+                glm::vec3 Fr = FrsRflct(wh, w0, F0);
+                glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
+
+                return roughSpec;
+            }
+
+            // Rough Diffuse BRDF
+            else
+            {
+                float nDotwi = glm::max(dot(hitInfo.normal, wi), 0.001f);
+                float nDotw0 = glm::max(dot(hitInfo.normal, w0), 0.001f);
+                glm::vec3 Fr = FrsRflct(wh, w0, F0);
+                glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
+
+                // Diffuse Lobe (Lambertian)
+                glm::vec3 kD = (1.0f - Fr) * (1.0f - hitInfo.mat.metallic); // diffuse ratio
+                glm::vec3 diffuse = (kD * albedo) / pi;
+
+                // PBR BRDF RESULT (Direct Lighting)
+                return (roughSpec + diffuse) * pi;
+            }
         }
 
         // Error Detection

@@ -244,11 +244,12 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // wi = glm::normalize(localSpace * wi);
 
         glm::vec3 wi;
+        float pdf = 1.0f;
 
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;
-        glm::vec3 rflct = BSDF(hitInfo, w0, wi);
+        glm::vec3 rflct = BSDF(hitInfo, w0, wi, pdf);
 
         // INDIRECT LIGHT
         Ray bounceRay;
@@ -260,7 +261,8 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         glm::vec3 Li = tracer(bounceRay, depth + 1);
 
         // color += (rflct * pi) * Li;
-        color += rflct * Li;
+        float nDotwi = glm::max(glm::dot(hitInfo.normal, wi), 0.0f);    // lambert's cos law
+        color += (rflct * Li * nDotwi) / pdf;
 
         return color;
     }
