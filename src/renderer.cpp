@@ -261,7 +261,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         glm::vec3 Li = tracer(bounceRay, depth + 1);
 
         // color += (rflct * pi) * Li;
-        float nDotwi = glm::max(glm::dot(hitInfo.normal, wi), 0.0f);    // lambert's cos law
+        float nDotwi = glm::abs(glm::dot(hitInfo.normal, wi)); // lambert's cos law
         color += (rflct * Li * nDotwi) / pdf;
 
         return color;
