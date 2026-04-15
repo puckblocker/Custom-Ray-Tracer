@@ -231,17 +231,17 @@ namespace Help
                 F0 = glm::vec3(glm::pow((ior - 1.0f) / (ior + 1.0f), 2.0f));
 
                 // Random Numbers
-                float xi_phi = RandFloat();
-                float xi_theta = RandFloat();
-                float xi_choice = RandFloat();
+                float xiPhi = RandFloat();
+                float xiTheta = RandFloat();
+                float xi0 = RandFloat();
 
                 // GGX SAMPLING
                 float alpha = glm::max(hitInfo.mat.roughness, 0.01f);
                 float alphaSqr = alpha * alpha;
 
                 // Random Point In Uniform Disk
-                float phi = 2.0f * pi * xi_phi;
-                float cosTheta = glm::sqrt((1.0f - xi_theta) / (1.0f + (alphaSqr - 1.0f) * xi_theta));
+                float phi = 2.0f * pi * xiPhi;
+                float cosTheta = glm::sqrt((1.0f - xiTheta) / (1.0f + (alphaSqr - 1.0f) * xiTheta));
                 float sinTheta = glm::sqrt(glm::max(0.0f, 1.0f - cosTheta * cosTheta));
 
                 wh.x = sinTheta * glm::cos(phi);
@@ -269,8 +269,8 @@ namespace Help
                 // Fresnel Reflection
                 float Fr = FrsRflct(wh, w0, F0).r;
 
-                // 3. REFLECT CHANCE
-                if (xi_choice <= Fr)
+                // REFLECT CHANCE
+                if (xi0 <= Fr)
                 {
                     // Reflect
                     wi = glm::reflect(-w0, wh);
@@ -292,7 +292,7 @@ namespace Help
                     pdf = glm::max(pdf, 0.001f);
 
                     // Return BRDF
-                    return (D_new * G_new * glm::vec3(Fr) * nDotwi) / (4.0f * nDotw0 * nDotwi);
+                    return (D_new * G_new * glm::vec3(Fr) * nDotwi) / (4.0f * nDotwi);
                 }
                 // Transmit (Refract)
                 else
@@ -327,7 +327,7 @@ namespace Help
                     // BTDF
                     float btdf = (D_new * G_new * w0Dotwh * wiDotwh) / (nDotw0 * nDotwi * denom);
                     float nDotwiT = glm::abs(glm::dot(hitInfo.normal, wi));
-                    return glm::vec3(btdf) * albedo;
+                    return glm::vec3(btdf) * (1.0f - Fr) * albedo;
                 }
             }
 

@@ -25,7 +25,7 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 16; // samples per pixel
+            int smpleAmnt = 64; // samples per pixel
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
