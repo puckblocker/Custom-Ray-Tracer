@@ -15,8 +15,8 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
 
 // FRAME BUFFER W/ PARALLELIZATION
 // Loop Through Pixel Rows (Preserves i and j pixels)
-#pragma omp parallel for                // creates threads to run portions of the loop in parallel
-    for (int j = 0; j < resHeight; j++) // render all pixels
+#pragma omp parallel for collapse(2) schedule(dynamic, 1) // creates threads to run portions of the loop in parallel
+    for (int j = 0; j < resHeight; j++)                   // render all pixels
     {
         for (int i = 0; i < resWidth; i++)
         {
@@ -25,7 +25,7 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 64; // samples per pixel
+            int smpleAmnt = 512; // samples per pixel
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
