@@ -9,7 +9,7 @@ using namespace Intersect;
 using namespace Help;
 
 // RENDER
-void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, int &sampleCount, float *pixelBufferTemp)
+void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, float &sampleCount)
 {
     camera.camViewUpdate();
 
@@ -25,7 +25,8 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, int &samp
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 256; // samples per pixel
+            int smpleAmnt = 4; // samples per pixel
+            float average = (float)smpleAmnt / (smpleAmnt + sampleCount);
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
@@ -52,16 +53,20 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, int &samp
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
 
             // PROGRESSIVE RENDERER (Average Total Samples)
-            // if (sampleCount > 4)
-            // {
-            //     pixelBufferTemp[index] = pixelBuffer[index];
-            //     color = ((pixelBufferTemp[index] * sampleCount) + color) / (sampleCount + 1.0f);
-            // }
-
-            // Grab RGB Components
-            pixelBuffer[index] = color.x;     // grab red value
-            pixelBuffer[index + 1] = color.y; // grab green value
-            pixelBuffer[index + 2] = color.z; // grab blue value
+            if (sampleCount > 0)
+            {
+                // color = ((pixelBufferTemp[index] * sampleCount) + color) / (sampleCount + 1.0f);
+                pixelBuffer[index] = glm::mix(pixelBuffer[index], color.r, average);         // weighted red
+                pixelBuffer[index + 1] = glm::mix(pixelBuffer[index + 1], color.g, average); // weighted green
+                pixelBuffer[index + 2] = glm::mix(pixelBuffer[index + 2], color.b, average); // weighted blue
+            }
+            else
+            {
+                // Grab RGB Components
+                pixelBuffer[index] = color.x;     // grab red value
+                pixelBuffer[index + 1] = color.y; // grab green value
+                pixelBuffer[index + 2] = color.z; // grab blue value
+            }
         }
     }
 }
@@ -190,18 +195,20 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // color += specCoeff;
 
         // VARIABLES
-        glm::vec3 wi;
+        glm::vec3 wiDirect;
         float pdf = 1.0f;
         float lightDist = 1.0f;
 
         // LIGHT SAMPLING & SHADOWS
-        glm::vec3 Le = light.pointLight(pointLight, hitInfo, wi, lightDist);
+        glm::vec3 Le;
+        // Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
+        Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
 
         // Generate Shadows
         bool inShadow = false;
         Ray shadowRay;
         shadowRay.origin = hitInfo.point + (hitInfo.normal * 0.01f); // offset to avoid self shadowing
-        shadowRay.direction = wi;
+        shadowRay.direction = wiDirect;
 
         // Shadow Block Check Sphere
         HitInfo shadowHit;
@@ -220,38 +227,35 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
                 inShadow = true;
         }
 
-        // In Shadow
-        // if (inShadow)
-        // {
-        //     // Set Color
-        //     glm::vec3 shadowColor = glm::vec3(0.05f) * hitInfo.mat.albedo;
-        //     color += shadowColor;
-        // }
-        // // Not In Shadow
-        // else
-        // {
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;
-        glm::vec3 rflct = BSDF(hitInfo, w0, wi, pdf);
+        glm::vec3 directLight = glm::vec3(0.0f);
 
-        // DIRECT LIGHT
-        glm::vec3 term1 = (rflct / 1.0f) * hitInfo.normal;
-        glm::vec3 term2 = wi * Le;
-        float directLight = glm::dot(term1, term2);
+        // Not In Shadow
+        if (!inShadow)
+        {
+            // DIRECT LIGHTING
+            glm::vec3 rflctDirect = DirectBRDF(hitInfo, w0, wiDirect);
+
+            float nDotWi = glm::dot(hitInfo.normal, wiDirect); // lambert's cos law
+            directLight = rflctDirect * nDotWi * Le;
+        }
 
         // INDIRECT LIGHT
+        glm::vec3 wiIndirect;
+        glm::vec3 rflctIndirect = BSDF(hitInfo, w0, wiIndirect, pdf);
         Ray bounceRay;
-        bounceRay.direction = wi;
-        glm::vec3 normOffset = glm::dot(wi, hitInfo.normal) < 0.0f ? -hitInfo.normal : hitInfo.normal; // prevent self intersection
+        bounceRay.direction = wiIndirect;
+        glm::vec3 normOffset = glm::dot(wiIndirect, hitInfo.normal) < 0.0f ? -hitInfo.normal : hitInfo.normal; // prevent self intersection
         bounceRay.origin = hitInfo.point + (normOffset * 0.002f);
 
         // Indirect Light Calculation
         glm::vec3 Li = tracer(bounceRay, depth + 1);
 
         // color += (rflct * pi) * Li;
-        float nDotwi = glm::abs(glm::dot(hitInfo.normal, wi)); // lambert's cos law
-        glm::vec3 indirectLight = (rflct * Li * nDotwi) / pdf;
+        float nDotwi = glm::abs(glm::dot(hitInfo.normal, wiIndirect)); // lambert's cos law
+        glm::vec3 indirectLight = (rflctIndirect * Li * nDotwi) / pdf;
 
         // Final Color
         color += indirectLight + directLight;

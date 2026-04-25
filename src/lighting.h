@@ -17,14 +17,21 @@ public:
         glm::vec3 color = glm::vec3(0.0f);  // exitant radiance
     };
 
-    // Direct Light
+    // DIRECTIONAL LIGHT
     struct dLight
     {
         glm::vec3 direction = glm::vec3(0.0f);
         glm::vec3 color = glm::vec3(0.0f);
     };
 
+    // AREA LIGHT
+    // struct aLight
+    // {
+    //     glm::vec3 direction
+    // }
+
     // FUNCTION SIGNATURES
     glm::vec3 pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist);
-    glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir);
+    glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 &wi);
+    // glm::vec3 areaLight(aLight light, HitInto hitInfo, glm::vec3 &wi);
 };

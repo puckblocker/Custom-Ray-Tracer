@@ -20,6 +20,7 @@ namespace Help
     // Geometry Function (Approx relative surface area where micro surface details overshadow each other, causing light rays to be covered (from opengl))
     float GeomFunc(float k, glm::vec3 normal, glm::vec3 w0, glm::vec3 wi);
 
-    // PBR BRDF CALCULATIONS (DIRECT LIGHTING)
-    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf);
+    // PBR BRDF CALCULATIONS
+    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf); // indirect
+    glm::vec3 DirectBRDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi); // direct
 }

@@ -45,6 +45,56 @@ namespace Help
         return G;
     }
 
+    // DIRECT LIGHTING BRDF
+    glm::vec3 DirectBRDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi)
+    {
+        // PERFECT SMOOTH CHECK
+        if (hitInfo.mat.roughness == 0.0f)
+        {
+            return glm::vec3(0.0f);
+        }
+
+        // VARIABLES
+        float pi = 3.14159265359;
+
+        float nDotW0 = glm::max(glm::dot(hitInfo.normal, w0), 0.001f);
+        float nDotWi = glm::max(glm::dot(hitInfo.normal, wi), 0.001f);
+
+        glm::vec3 wh = glm::normalize(w0 + wi); // half-way vector
+
+        // IDEAL SPECULAR
+        // Fresnel Schlick Approx (Calculate Reflection Based On Incident Angle)
+        glm::vec3 F0 = glm::vec3(0.04f);
+        if (hitInfo.mat.metallic)
+        {
+            F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // mix the fresnel reflection with the base color based on how metallic object is
+        }
+
+        // ROUGH SPECULAR (Direction Diffuse)
+
+        // Trowbridge Reitz (Normal Distr Function)
+        float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
+        float alphaSqr = alpha * alpha;
+        float k = (alphaSqr + 1.0f) / 8.0f;
+        float D = DistrFunc(alphaSqr, hitInfo.normal, wh); // how aligned surface normal is with microfacet normals
+        float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
+
+        // Rough Specular BRDF
+        glm::vec3 Fr = FrsRflct(wh, w0, F0);
+        glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotW0 * nDotWi);
+
+        // Ideal Diffuse
+        glm::vec3 kD = glm::vec3(1.0f) - Fr;
+        kD *= (1.0f - hitInfo.mat.metallic);
+        glm::vec3 idealDiffuse = (kD * hitInfo.mat.albedo) / pi;
+        // glm::vec3 idealDiffuse = hitInfo.mat.albedo / pi;
+
+        // PBR BRDF RESULT (Direct Lighting)
+        glm::vec3 directLighting = idealDiffuse + roughSpec;
+
+        return directLighting;
+    }
+
     glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
         // Variables

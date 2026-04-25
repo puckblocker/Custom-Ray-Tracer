@@ -2,8 +2,10 @@
 #include "intersection.h"
 #include <glm/glm.hpp>
 
+// Point Light (No Geometry To Hit)
 glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
 {
+    // PDF is 1
     // VARIABLES
     glm::vec3 point = hitInfo.point;
 
@@ -15,22 +17,22 @@ glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float 
 
     // EMITTED RADIANCE
     dist = glm::length(light.origin - point);
-    float attentuation = 1.0f / (dist * dist);                       // reduce lighting effect
-    wi = (point - light.origin) / glm::length(point - light.origin); // wi (incoming direction)
-    glm::vec3 Le = light.color * attentuation;                       // irradiance
+    float attentuation = 1.0f / (dist * dist); // reduce lighting effect
+    wi = (light.origin - point) / dist;        // wi (incoming direction)
 
+    // Irradiance
+    glm::vec3 Le = light.color * attentuation; // irradiance
     return Le;
 }
 
-glm::vec3 Light::directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir)
+// Directional Light (Infinite)
+glm::vec3 Light::directionalLight(dLight light, HitInfo hitInfo, glm::vec3 &wi)
 {
+    // PDF is 1.0
     // Light Direction
-    glm::vec3 lightDir = glm::normalize(-light.direction);
+    wi = glm::normalize(-light.direction);
 
-    // Cosine Term (How Much Light Is Hitting)
-    float lightAmnt = glm::max(glm::dot(-light.direction, hitInfo.normal), 0.0f);
-
-    glm::vec3 exitRad = light.color * lightAmnt;
-
-    return exitRad;
+    // Irradiance
+    glm::vec3 Le = light.color;
+    return Le;
 }
