@@ -178,8 +178,8 @@ namespace Help
                 F0 = albedo;
 
                 // GGX SAMPLING
-                float alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
-                float alphaSqr = alpha * alpha;
+                alpha = glm::max(hitInfo.mat.roughness, 0.01f); // roughness parameter
+                alphaSqr = alpha * alpha;
 
                 // Random Point In Uniform Disk
                 float phi = 2.0f * pi * Xi0;
@@ -190,11 +190,8 @@ namespace Help
                 wh.y = sinTheta * glm::sin(phi); // random point on y
                 wh.z = cosTheta;
 
-                // Transform wh Back To Underformed Space Via Orthonormal Basis
-                glm::vec3 normUp = (glm::abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
-                glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
-                glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
-                wh = glm::normalize(orthoU * wh.x + orthoUp * wh.y + hitInfo.normal * wh.z); // local to world transformation
+                // Local To World Transform
+                wh = glm::normalize(orthoU * wh.x + orthoUp * wh.y + hitInfo.normal * wh.z);
 
                 wi = glm::reflect(-w0, wh); // final outgoing vector (bounce direction)
 
@@ -248,10 +245,7 @@ namespace Help
                 wh.y = sinTheta * glm::sin(phi);
                 wh.z = cosTheta;
 
-                // Transform wh Back To Underformed Space
-                glm::vec3 normUp = (glm::abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
-                glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
-                glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
+                // Local To World Transform
                 wh = glm::normalize(orthoU * wh.x + orthoUp * wh.y + hitInfo.normal * wh.z);
 
                 if (glm::dot(wh, w0) < 0.0f)
