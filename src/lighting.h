@@ -25,6 +25,6 @@ public:
     };
 
     // FUNCTION SIGNATURES
-    glm::vec3 pointLight(glm::vec3 point, pLight light, HitInfo hitInfo, glm::vec3 viewDir);
+    glm::vec3 pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist);
     glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir);
 };

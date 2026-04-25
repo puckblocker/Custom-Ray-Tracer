@@ -9,7 +9,7 @@ using namespace Intersect;
 using namespace Help;
 
 // RENDER
-void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
+void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, int &sampleCount, float *pixelBufferTemp)
 {
     camera.camViewUpdate();
 
@@ -25,7 +25,7 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             Ray ray;
 
             glm::vec3 color(0.0f);
-            int smpleAmnt = 512; // samples per pixel
+            int smpleAmnt = 256; // samples per pixel
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
@@ -49,11 +49,19 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight)
             // Average Radiance Calculation (Monte Carlo)
             color = color / float(smpleAmnt);
 
-            // Grab RGB Components
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
-            pixelBuffer[index] = color.x;       // grab red value
-            pixelBuffer[index + 1] = color.y;   // grab green value
-            pixelBuffer[index + 2] = color.z;   // grab blue value
+
+            // PROGRESSIVE RENDERER (Average Total Samples)
+            // if (sampleCount > 4)
+            // {
+            //     pixelBufferTemp[index] = pixelBuffer[index];
+            //     color = ((pixelBufferTemp[index] * sampleCount) + color) / (sampleCount + 1.0f);
+            // }
+
+            // Grab RGB Components
+            pixelBuffer[index] = color.x;     // grab red value
+            pixelBuffer[index + 1] = color.y; // grab green value
+            pixelBuffer[index + 2] = color.z; // grab blue value
         }
     }
 }
@@ -181,75 +189,56 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // color += specCoeff;
 
-        // PATH TRACING SECTION (Not to self: DELETE COMMENT)
-        // HEMISPHERE SAMPLING
-        // Variables
-        // float xi0 = RandFloat();
-        // float xi1 = RandFloat();
-        // float xi2 = RandFloat();
-
-        // // Azimuthal & Polar Angles
-        // float theta = glm::acos(xi0);
-        // float phi = 2 * pi * xi1;
-
-        // // COS WEIGHTED UIT HEMISPHERE SAMPLING (IMPORTANCE SAMPLING)
-        // // Random Variables
-        // float Xi0 = RandFloat();
-        // float Xi1 = RandFloat();
-
-        // // Uniform Disc Sample
-        // float dXi0 = 2 * Xi0 - 1.0f;
-        // float dXi1 = 2 * Xi1 - 1.0f;
-        // float r;
-        // float theta;
-
-        // // Prevent Division By Zero
-        // if (dXi0 == 0 && dXi1 == 0)
-        // {
-        //     r = 0.0f;
-        //     theta = 0.0f;
-        // }
-
-        // else if (glm::abs(dXi0) > glm::abs(dXi1))
-        // {
-        //     theta = (pi / (4.0f)) * (dXi1 / dXi0);
-        //     r = dXi0;
-        // }
-        // else
-        // {
-        //     theta = (pi / (2.0f)) - (pi / (4.0f)) * (dXi0 / dXi1);
-        //     r = dXi1;
-        // }
-
-        // // Project Point Onto Hemisphere
-        // glm::vec3 wi;
-        // wi.x = r * glm::cos(theta);
-        // wi.y = r * glm::sin(theta);
-        // wi.z = glm::sqrt(1 - r * r);
-
-        // // PDF / PROBABILITY
-        // // Sampling and Direction Probability (Cosine Weighted)
-        // float pw = glm::cos(theta) / pi;
-
-        // // Convert wi To World Space
-        // // Axis Calculation
-        // glm::vec3 normUp = (abs(hitInfo.normal.z) < 0.999f) ? glm::vec3(0, 0, 1) : glm::vec3(1, 0, 0);
-        // glm::vec3 orthoU = glm::normalize(glm::cross(normUp, hitInfo.normal));
-        // glm::vec3 orthoUp = glm::cross(orthoU, hitInfo.normal);
-
-        // // Rotation Matrix
-        // glm::mat3 localSpace = glm::mat3(orthoU, orthoUp, hitInfo.normal);
-
-        // // Rotate Into World Space
-        // wi = glm::normalize(localSpace * wi);
-
+        // VARIABLES
         glm::vec3 wi;
         float pdf = 1.0f;
+        float lightDist = 1.0f;
 
+        // LIGHT SAMPLING & SHADOWS
+        glm::vec3 Le = light.pointLight(pointLight, hitInfo, wi, lightDist);
+
+        // Generate Shadows
+        bool inShadow = false;
+        Ray shadowRay;
+        shadowRay.origin = hitInfo.point + (hitInfo.normal * 0.01f); // offset to avoid self shadowing
+        shadowRay.direction = wi;
+
+        // Shadow Block Check Sphere
+        HitInfo shadowHit;
+        for (i = 0; i < spheres.size(); i++)
+        {
+            shadowHit = intersectSphere(shadowRay, spheres[i], xForms);
+            if (shadowHit.valid && shadowHit.distance < lightDist && hitInfo.objID != shadowHit.objID) // Check for hit and behind object
+                inShadow = true;
+        }
+
+        // Shadow Block Check Plane
+        for (i = 0; i < planes.size(); i++)
+        {
+            shadowHit = intersectPlane(shadowRay, planes[i], xForms);
+            if (shadowHit.valid && shadowHit.distance < lightDist && hitInfo.objID != shadowHit.objID)
+                inShadow = true;
+        }
+
+        // In Shadow
+        // if (inShadow)
+        // {
+        //     // Set Color
+        //     glm::vec3 shadowColor = glm::vec3(0.05f) * hitInfo.mat.albedo;
+        //     color += shadowColor;
+        // }
+        // // Not In Shadow
+        // else
+        // {
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;
         glm::vec3 rflct = BSDF(hitInfo, w0, wi, pdf);
+
+        // DIRECT LIGHT
+        glm::vec3 term1 = (rflct / 1.0f) * hitInfo.normal;
+        glm::vec3 term2 = wi * Le;
+        float directLight = glm::dot(term1, term2);
 
         // INDIRECT LIGHT
         Ray bounceRay;
@@ -262,24 +251,22 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // color += (rflct * pi) * Li;
         float nDotwi = glm::abs(glm::dot(hitInfo.normal, wi)); // lambert's cos law
-        color += (rflct * Li * nDotwi) / pdf;
+        glm::vec3 indirectLight = (rflct * Li * nDotwi) / pdf;
+
+        // Final Color
+        color += indirectLight + directLight;
+        //}
 
         return color;
-    }
-    // Direct Light Hit
-    else if (hitInfo.valid && hitInfo.mat.emissive == true)
-    {
-        // Return Emission
-        return hitInfo.mat.albedo;
     }
     // Exited Scene
     else
     {
         // Set Sky Color
-        // return glm::vec3(0.69f, 0.88f, 1.0f);
+        return glm::vec3(0.69f, 0.88f, 1.0f);
 
         // Add Emission From All Infinite Lights
-        return directionalLight.color;
+        // return directionalLight.color;
     }
 }
 

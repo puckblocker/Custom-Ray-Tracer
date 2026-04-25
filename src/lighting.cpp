@@ -2,11 +2,10 @@
 #include "intersection.h"
 #include <glm/glm.hpp>
 
-glm::vec3 Light::pointLight(glm::vec3 point, pLight light, HitInfo hitInfo, glm::vec3 viewDir)
+glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
 {
     // VARIABLES
-    glm::vec3 reflctRad;
-    float pi = 3.14159265359;
+    glm::vec3 point = hitInfo.point;
 
     // MOST IMPORTANT > radiance = radiant flux / area * angle // radiant flux = energy / time // irradiance = energy / time * area
     // power leaving surface = power surface emits + (incoming power - absorbed power)
@@ -14,18 +13,13 @@ glm::vec3 Light::pointLight(glm::vec3 point, pLight light, HitInfo hitInfo, glm:
     // BRDF (fr)  fr(p, wo, wi) = (d*L0(p,w0)) / (Li(p,wi)*(n*wi)d*wi)
     // fr(p, wo, wi) >= 0, BRDF never negative // fr(p, wo, wi) = fr(p,wi,w0) Helmhotz, direction of calc doesn't matter // Energy conservation, BRDF doesn't create energy
 
-    // EXITANT RADIANCE
-    float lightDist = glm::length(light.origin - point);
-    float attentuation = 1.0f / (lightDist * lightDist);       // reduce lighting effect
-    glm::vec3 lightDir = glm::normalize(light.origin - point); // wi (incoming direction)
-    glm::vec3 exitRad = light.color * attentuation;
+    // EMITTED RADIANCE
+    dist = glm::length(light.origin - point);
+    float attentuation = 1.0f / (dist * dist);                       // reduce lighting effect
+    wi = (point - light.origin) / glm::length(point - light.origin); // wi (incoming direction)
+    glm::vec3 Le = light.color * attentuation;                       // irradiance
 
-    // CALCULATE REFLECTED IRRADIANCE
-    glm::vec3 incomRad = exitRad;                       // incoming irradiance
-    float cosTerm = glm::dot(hitInfo.normal, lightDir); // how much light spreads out and weakens (Lambert's Cosine Law)
-    reflctRad = incomRad * glm::max(cosTerm, 0.0f);     // reflected irradiance
-
-    return reflctRad;
+    return Le;
 }
 
 glm::vec3 Light::directionalLight(dLight light, HitInfo hitInfo, glm::vec3 viewDir)

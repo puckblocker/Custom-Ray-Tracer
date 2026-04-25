@@ -40,7 +40,8 @@ int main()
     const int resWidth = 640;
     const int resHeight = 640;
     // Create Pixel Buffer to Heap
-    float *pixelBuffer = new float[resWidth * resHeight * 3]; // holds total pixel count * total color count (RGB) to give each pixel it's own RGB variables
+    float *pixelBuffer = new float[resWidth * resHeight * 3];     // holds total pixel count * total color count (RGB) to give each pixel it's own RGB variables
+    float *pixelBufferTemp = new float[resWidth * resHeight * 3]; // holds total pixel count * total color count (RGB) to give each pixel it's own RGB variables
 
     // ERROR CHECKERS + SETUP
     // GLFW error checker
@@ -125,7 +126,11 @@ int main()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resWidth, resHeight, 0, GL_RGB, GL_FLOAT, NULL); // creates a 2D texture imaghe (allocates GPU memory) / stores vertices in the texture
 
     // CALL RENDERER
-    renderer.render(pixelBuffer, resWidth, resHeight);
+    // float totFrames = 0;
+    // renderer.render(pixelBuffer, resWidth, resHeight);
+    // totFrames += 4;
+    int sampleCount = 0;
+    renderer.render(pixelBuffer, resWidth, resHeight, sampleCount, pixelBufferTemp);
 
     // OPEN WINDOW
     while (!glfwWindowShouldClose(window)) // keeps window up until closed by user
@@ -134,7 +139,7 @@ int main()
         glClearColor(.75f, .5f, .75f, 1.0f); // set color that will be used to clear the screen
         glClear(GL_COLOR_BUFFER_BIT);        // clears screen with constant to tell which buffer to clear (color buffer)
 
-        // renderer.render(pixelBuffer, resWidth, resHeight);
+        // renderer.render(pixelBuffer, resWidth, resHeight, sampleCount, pixelBufferTemp);
 
         // DISPLAY RAY TRACER
         // Create Image / Upload to GPU
@@ -146,10 +151,24 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6); // starting indices of triangles
 
         glfwSwapBuffers(window); // keeps display updated / swaps buffer
+
+        // PROGRESSIVE RENDERER
+        // Call Renderer
+        // pixelBufferTemp = pixelBuffer; // store pixel buffer
+        // renderer.render(pixelBuffer, resWidth, resHeight);
+        // totFrames += 4; // update frame count
+
+        // pixelBuffer = ((pixelBufferTemp * totFrames) + pixelBuffer) / (totFrames + 1.0f);
+        // pixelBuffer = glm::lerp(pixelBufferTemp, pixelBuffer, 1.0f / (totFrames + 1.0f));
+
+        // Sample Count
+        // sampleCount += 4;
+        // std::cout << "Total Samples: " << sampleCount << endl;
     }
 
     // Terminate
     delete[] pixelBuffer; // clean up heap
+    delete[] pixelBufferTemp;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);

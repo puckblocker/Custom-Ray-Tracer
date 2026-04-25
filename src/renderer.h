@@ -26,7 +26,7 @@ public:
     Light::dLight directionalLight;
 
     // FUNCTION SIGNATURES
-    void render(float *pixelBuffer, int resWidth, int resHeight);
+    void render(float *pixelBuffer, int resWidth, int resHeight, int &sampleCount, float *pixelBufferTemp);
     glm::vec3 tracer(Ray ray, unsigned int depth);
     void loadScene(const std::string &filename);
 };
