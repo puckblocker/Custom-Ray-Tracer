@@ -24,6 +24,7 @@ public:
     std::vector<Intersect::xForm> xForms;
     Light::pLight pointLight;
     Light::dLight directionalLight;
+    Light::aLight areaLight;
 
     // FUNCTION SIGNATURES
     void render(float *pixelBuffer, int resWidth, int resHeight, float &sampleCount);

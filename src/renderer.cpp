@@ -121,79 +121,6 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     // Non Light Hit
     if (hitInfo.valid && hitInfo.mat.emissive == false)
     {
-        // // Shadow Variables
-        // glm::vec3 toLight; // = pointLight.origin - hitInfo.point;
-        // float distToLight; // = glm::length(toLight);
-        // glm::vec3 lightRad;
-        // bool inShadow = false;
-        // float pi = 3.14159265359;
-        // glm::vec3 R = hitInfo.mat.albedo;                             // reflectance
-        // glm::vec3 w0 = glm::normalize(camera.origin - hitInfo.point); // outgoing direction
-
-        // if (glm::length(directionalLight.color) > 0.0f)
-        // {
-        //     toLight = glm::normalize(-directionalLight.direction);
-        //     distToLight = 1000000.0f;
-        //     lightRad = light.directionalLight(directionalLight, hitInfo, w0);
-        // }
-        // else if (glm::length(pointLight.color) > 0.0f)
-        // {
-        //     toLight = pointLight.origin - hitInfo.point;
-        //     distToLight = glm::length(toLight);
-        //     lightRad = light.pointLight(hitInfo.point, pointLight, hitInfo, w0);
-        // }
-
-        // glm::vec3 wi = glm::normalize(toLight); // incoming direction
-
-        // // Generate Shadows
-        // Ray shadowRay;
-        // shadowRay.origin = hitInfo.point + (hitInfo.normal * 0.01f); // offset to avoid self shadowing
-        // shadowRay.direction = glm::normalize(toLight);
-
-        // // Shadow Block Check
-        // // Sphere
-        // HitInfo shadowHit;
-        // for (i = 0; i < spheres.size(); i++)
-        // {
-        //     shadowHit = intersectSphere(shadowRay, spheres[i], xForms);
-        //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID) // Check for hit and behind object
-        //         inShadow = true;
-        // }
-
-        // // Triangle
-        // for (i = 0; i < triangles.size(); i++)
-        // {
-        //     shadowHit = intersectTriangle(shadowRay, triangles[i], xForms);
-        //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
-        //         inShadow = true;
-        // }
-
-        // // Plane
-        // for (i = 0; i < planes.size(); i++)
-        // {
-        //     shadowHit = intersectPlane(shadowRay, planes[i], xForms);
-        //     if (shadowHit.valid && shadowHit.distance < distToLight && hitInfo.objID != shadowHit.objID)
-        //         inShadow = true;
-        // }
-
-        // // In Shadow
-        // if (inShadow)
-        // {
-        //     // Set Color
-        //     specCoeff = glm::vec3(0.05f) * hitInfo.mat.albedo;
-        // }
-        // // Not In Shadow
-        // else
-        // {
-        //     // PBR BRDF Calculations (DIRECT LIGHTING)
-        //     glm::vec3 directLighting = BRDF(R, hitInfo, w0, wi);
-
-        //     // Add To Color
-        //     specCoeff = directLighting * lightRad;
-        // }
-
-        // color += specCoeff;
-
         // VARIABLES
         glm::vec3 wiDirect;
         float pdf = 1.0f;
@@ -202,7 +129,8 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // LIGHT SAMPLING & SHADOWS
         glm::vec3 Le;
         // Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
-        Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
+        // Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
+        Le = light.areaLight(areaLight, hitInfo, wiDirect, lightDist);
 
         // Generate Shadows
         bool inShadow = false;
@@ -259,7 +187,6 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // Final Color
         color += indirectLight + directLight;
-        //}
 
         return color;
     }
@@ -350,6 +277,16 @@ void Renderer::loadScene(const std::string &filename)
             //  Light Stats
             file >> pointLight.origin.x >> pointLight.origin.y >> pointLight.origin.z;
             file >> pointLight.color.r >> pointLight.color.g >> pointLight.color.b;
+        }
+
+        else if (type == "aLight")
+        {
+            // Light Stats
+            file >> areaLight.origin.x >> areaLight.origin.y >> areaLight.origin.z;
+            file >> areaLight.color.r >> areaLight.color.g >> areaLight.color.b;
+            file >> areaLight.normal.x >> areaLight.normal.y >> areaLight.normal.z;
+            file >> areaLight.u.x >> areaLight.u.y >> areaLight.u.z;
+            file >> areaLight.v.x >> areaLight.v.y >> areaLight.v.z;
         }
 
         else if (type == "dLight")

@@ -2,6 +2,8 @@
 #include "intersection.h"
 #include <glm/glm.hpp>
 
+using namespace Help;
+
 // Point Light (No Geometry To Hit)
 glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
 {
@@ -34,5 +36,26 @@ glm::vec3 Light::directionalLight(dLight light, HitInfo hitInfo, glm::vec3 &wi)
 
     // Irradiance
     glm::vec3 Le = light.color;
+    return Le;
+}
+
+// Area Light
+glm::vec3 Light::areaLight(aLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
+{
+    // Random Values
+    float X0 = RandFloat();
+    float Xi = RandFloat();
+
+    // SAMPLING
+    glm::vec3 randPoint = light.origin + (X0 * light.u) + (Xi * light.v);
+
+    // Calculations
+    float A = glm::length(glm::cross(light.u, light.v)); // surface area
+    dist = glm::length(randPoint - hitInfo.point);
+    wi = (randPoint - hitInfo.point) / dist;
+
+    // Irradiance
+    glm::vec3 Le = light.color / (pi * A);
+
     return Le;
 }

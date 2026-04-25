@@ -14,7 +14,7 @@ public:
     struct pLight
     {
         glm::vec3 origin = glm::vec3(0.0f); // light position in global coords
-        glm::vec3 color = glm::vec3(0.0f);  // exitant radiance
+        glm::vec3 color = glm::vec3(0.0f);  // color / power
     };
 
     // DIRECTIONAL LIGHT
@@ -25,13 +25,17 @@ public:
     };
 
     // AREA LIGHT
-    // struct aLight
-    // {
-    //     glm::vec3 direction
-    // }
+    struct aLight
+    {
+        glm::vec3 origin = glm::vec3(0.0f);
+        glm::vec3 color = glm::vec3(0.0f);
+        glm::vec3 normal;
+        glm::vec3 u; // width & rotation
+        glm::vec3 v; // height & rotation
+    };
 
     // FUNCTION SIGNATURES
     glm::vec3 pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist);
     glm::vec3 directionalLight(dLight light, HitInfo hitInfo, glm::vec3 &wi);
-    // glm::vec3 areaLight(aLight light, HitInto hitInfo, glm::vec3 &wi);
+    glm::vec3 areaLight(aLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist);
 };
