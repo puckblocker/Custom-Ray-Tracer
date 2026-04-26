@@ -21,6 +21,7 @@ namespace Help
     float GeomFunc(float k, glm::vec3 normal, glm::vec3 w0, glm::vec3 wi);
 
     // PBR BRDF CALCULATIONS
-    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf); // indirect
-    glm::vec3 DirectBRDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi); // direct
+    glm::vec3 BxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf); // indirect
+    glm::vec3 DirectBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi); // direct
+    glm::vec3 LayeredBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf); // layered
 }

@@ -19,9 +19,11 @@ struct HitInfo
     {
         glm::vec3 albedo; // object's reflectance/color
         float roughness;  // 0 = smooth // 1 = rough
-        float metallic;    // metallic / conductor
+        float metallic;   // metallic / conductor
         float ior;        // Index of Refraction (is object glass)
         bool emissive;    // is object a light
+        float z;          // depth
+        float layerIOR;   // ior for layered
     };
 
     Material mat;
@@ -53,6 +55,8 @@ namespace Intersect
         float metallic;
         float ior;
         float emissive;
+        float z;        // depth
+        float layerIOR; // ior for layered
         bool animated = false;
     };
 

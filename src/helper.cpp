@@ -45,10 +45,90 @@ namespace Help
         return G;
     }
 
-    // DIRECT LIGHTING BRDF
-    glm::vec3 DirectBRDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi)
+    // LAYERED BSDF (Random Instead of Deterministic)
+    glm::vec3 LayeredBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
-        // PERFECT SMOOTH CHECK
+        int maxDepth = 5;
+
+        // Top Layer Hit
+        HitInfo topLayer = hitInfo;
+        topLayer.mat.roughness = 0.0f;
+        topLayer.mat.metallic = 0.0f;
+        topLayer.mat.ior = hitInfo.mat.layerIOR;
+        topLayer.mat.albedo = glm::vec3(1.0f);
+
+        // BxDF CALL
+        glm::vec3 f = BxDF(topLayer, w0, wi, pdf); // initial check for if entered layer of not
+
+        // Outside Check
+        float cosThetaOut = glm::dot(wi, hitInfo.normal);
+        float cosThetaIn = glm::dot(w0, hitInfo.normal);
+
+        // REFLECTED
+        if (cosThetaOut > 0.0f && cosThetaIn > 0.0f)
+        {
+            return f;
+        }
+
+        // REFLECTED
+        // if (wi.z > 0.0f && w0.z > 0.0f)
+        // {
+        //     return f; // return BxDF
+        // }
+
+        // TRANSMITTED
+        glm::vec3 w; // current direction
+        w = wi;      // starting direction
+        float z = hitInfo.mat.z;
+
+        // RANDOM WALK
+        for (int depth = 0; depth < maxDepth; ++depth)
+        {
+            // Beer's Law Absorbance
+            // float distance = hitInfo.mat.z / glm::abs(w.z);
+            float cosThetaW = glm::dot(w, hitInfo.normal);
+            float distance = hitInfo.mat.z / glm::max(glm::abs(cosThetaW), 0.001f);
+            f *= std::exp(-distance);
+
+            z = (z == hitInfo.mat.z) ? 0.0f : hitInfo.mat.z;
+
+            // Boundary Hit Check
+            HitInfo crntHit = hitInfo;
+
+            // Bottom Boundary
+            if (z == 0.0f)
+            {
+                crntHit.mat = hitInfo.mat;
+            }
+            // Top Boundary
+            else
+            {
+                crntHit.mat = topLayer.mat;
+            }
+
+            // Bounce
+            float pdfBounce = 0.0f;
+            glm::vec3 color = BxDF(crntHit, -w, wi, pdfBounce);
+            f *= color;
+            pdf *= pdfBounce;
+            w = wi;
+
+            cosThetaW = glm::dot(w, hitInfo.normal);
+
+            // Escape Check
+            if (cosThetaW < 0.0f && z == hitInfo.mat.z)
+            {
+                break;
+            }
+        }
+
+        return glm::vec3(0.0f);
+    }
+
+    // DIRECT LIGHTING BRDF
+    glm::vec3 DirectBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi)
+    {
+        // PERFECT SMOOTH CHECK (Dirac Delta)
         if (hitInfo.mat.roughness == 0.0f)
         {
             return glm::vec3(0.0f);
@@ -95,7 +175,7 @@ namespace Help
         return directLighting;
     }
 
-    glm::vec3 BSDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
+    glm::vec3 BxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
         // Variables
         float ior = hitInfo.mat.ior;
@@ -115,6 +195,7 @@ namespace Help
                 bool outside = glm::dot(w0, normal) > 0.0f;
                 glm::vec3 n = outside ? normal : -normal;
                 float eta = outside ? (1.0f / ior) : ior;
+                float cosTheta;
 
                 // CORRECTED SCHLICK APPROXIMATION
                 F0 = glm::vec3(glm::pow((ior - 1) / (ior + 1), 2.0f));
@@ -129,6 +210,8 @@ namespace Help
                 if (uc < (Fr.r / (Fr.r + pt)))
                 {
                     wi = glm::reflect(-w0, n);
+                    pdf = 1.0f;
+                    cosTheta = glm::max(glm::abs(glm::dot(n, wi)), 0.001f);
                     return glm::vec3(1.0f);
                 }
                 // Perfect Specular Transmission
@@ -141,6 +224,9 @@ namespace Help
                     {
                         wi = glm::reflect(-w0, n);
                     }
+
+                    pdf = 1.0f;
+                    cosTheta = glm::max(glm::abs(glm::dot(n, wi)), 0.001f);
                     return glm::vec3(1.0f);
                 }
             }
@@ -156,6 +242,9 @@ namespace Help
                 // BSDF CALCULATION
                 // return Fr / glm::abs(nDotw0);
                 Fr = FrsRflct(normal, w0, F0);
+
+                pdf = 1.0f;
+                float cosTheta = glm::max(glm::abs(glm::dot(normal, wi)), 0.001f);
                 return Fr;
             }
         }
@@ -198,7 +287,8 @@ namespace Help
 
             // PDF / PROBABILITY
             // Sampling and Direction Probability (Cosine Weighted)
-            // pdf = glm::cos(theta) / pi;
+            pdf = wi.z / pi;
+            pdf = glm::max(pdf, 0.001f);
 
             // Convert wi To World Space
             // Axis Calculation
@@ -388,7 +478,8 @@ namespace Help
                 glm::vec3 diffuse = (kD * albedo) / pi;
 
                 // PBR BRDF RESULT (Direct Lighting)
-                return (roughSpec + diffuse) * pi;
+                // return (roughSpec + diffuse) * pi;
+                return diffuse * pi;
             }
         }
 

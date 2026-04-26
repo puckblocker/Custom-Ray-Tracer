@@ -125,7 +125,7 @@ namespace Intersect
                 hitInfo.valid = true;
                 hitInfo.distance = crntDist;
                 hitInfo.objID = sphere.objID;
-                hitInfo.mat = {sphere.albedo, sphere.roughness, sphere.metallic, sphere.ior, sphere.emissive > 0.0f};
+                hitInfo.mat = {sphere.albedo, sphere.roughness, sphere.metallic, sphere.ior, sphere.emissive > 0.0f, sphere.z, sphere.layerIOR};
                 hitInfo.point = glm::vec3(ls.wrldToLocal * glm::vec4(point, 1.0f));
                 glm::vec3 localNorm = glm::normalize(point - sphere.center);
                 hitInfo.normal = glm::normalize(ls.nrmMtrx * localNorm);
@@ -194,7 +194,7 @@ namespace Intersect
             hitInfo.valid = true;
             hitInfo.objID = triangle.objID;
             hitInfo.distance = t; // distance
-            hitInfo.mat = {triangle.albedo, triangle.roughness, triangle.metallic, triangle.ior, triangle.emissive > 0.0f};
+            hitInfo.mat = {triangle.albedo, triangle.roughness, triangle.metallic, triangle.ior, triangle.emissive > 0.0f, triangle.z, triangle.layerIOR};
             glm::vec3 localPoint = ls.localRay.origin + ls.localRay.direction * t; // calculate point
             hitInfo.point = glm::vec3(ls.wrldToLocal * glm::vec4(localPoint, 1.0f));
             glm::vec3 localNorm = glm::cross(edge1, edge2); // calculate normal
@@ -235,7 +235,7 @@ namespace Intersect
                 hitInfo.valid = true;
                 hitInfo.distance = crntDist;
                 hitInfo.objID = plane.objID;
-                hitInfo.mat = {plane.albedo, plane.roughness, plane.metallic, plane.ior, plane.emissive > 0.0f};
+                hitInfo.mat = {plane.albedo, plane.roughness, plane.metallic, plane.ior, plane.emissive > 0.0f, plane.z, plane.layerIOR};
                 hitInfo.point = glm::vec3(ls.wrldToLocal * glm::vec4(point, 1.0f));
                 hitInfo.normal = glm::normalize(ls.nrmMtrx * plane.normal);
 

@@ -164,7 +164,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         if (!inShadow)
         {
             // DIRECT LIGHTING
-            glm::vec3 rflctDirect = DirectBRDF(hitInfo, w0, wiDirect);
+            glm::vec3 rflctDirect = DirectBxDF(hitInfo, w0, wiDirect);
 
             float nDotWi = glm::dot(hitInfo.normal, wiDirect); // lambert's cos law
             directLight = rflctDirect * nDotWi * Le;
@@ -172,7 +172,17 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // INDIRECT LIGHT
         glm::vec3 wiIndirect;
-        glm::vec3 rflctIndirect = BSDF(hitInfo, w0, wiIndirect, pdf);
+        glm::vec3 rflctIndirect;
+
+        if (hitInfo.mat.z == 0.0f)
+        {
+            rflctIndirect = BxDF(hitInfo, w0, wiIndirect, pdf);
+        }
+        else
+        {
+            rflctIndirect = LayeredBxDF(hitInfo, w0, wiIndirect, pdf);
+        }
+
         Ray bounceRay;
         bounceRay.direction = wiIndirect;
         glm::vec3 normOffset = glm::dot(wiIndirect, hitInfo.normal) < 0.0f ? -hitInfo.normal : hitInfo.normal; // prevent self intersection
@@ -228,7 +238,7 @@ void Renderer::loadScene(const std::string &filename)
             file >> newSphere.radius;
             // Material Stats
             file >> newSphere.albedo.r >> newSphere.albedo.g >> newSphere.albedo.b;
-            file >> newSphere.metallic >> newSphere.roughness >> newSphere.ior >> newSphere.emissive;
+            file >> newSphere.metallic >> newSphere.roughness >> newSphere.ior >> newSphere.emissive >> newSphere.z >> newSphere.layerIOR;
             file >> newSphere.animated;
             objID += 1;
             newSphere.objID = objID;
@@ -249,7 +259,7 @@ void Renderer::loadScene(const std::string &filename)
             file >> newTriangle.p2.x >> newTriangle.p2.y >> newTriangle.p2.z;
             // Material Stats
             file >> newTriangle.albedo.r >> newTriangle.albedo.g >> newTriangle.albedo.b;
-            file >> newTriangle.metallic >> newTriangle.roughness >> newTriangle.ior >> newTriangle.emissive;
+            file >> newTriangle.metallic >> newTriangle.roughness >> newTriangle.ior >> newTriangle.emissive >> newTriangle.z >> newTriangle.layerIOR;
 
             objID += 1;
             newTriangle.objID = objID;
@@ -264,7 +274,7 @@ void Renderer::loadScene(const std::string &filename)
             file >> newPlane.normal.x >> newPlane.normal.y >> newPlane.normal.z;
             // Material Stats
             file >> newPlane.albedo.r >> newPlane.albedo.g >> newPlane.albedo.b;
-            file >> newPlane.metallic >> newPlane.roughness >> newPlane.ior >> newPlane.emissive;
+            file >> newPlane.metallic >> newPlane.roughness >> newPlane.ior >> newPlane.emissive >> newPlane.z >> newPlane.layerIOR;
             objID += 1;
             newPlane.objID = objID;
 
