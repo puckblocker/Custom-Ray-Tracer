@@ -130,7 +130,20 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         glm::vec3 Le;
         // Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
         // Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
-        Le = light.areaLight(areaLight, hitInfo, wiDirect, lightDist);
+
+        if (glm::length(areaLight.color) > 0.0f)
+        {
+            Le = light.areaLight(areaLight, hitInfo, wiDirect, lightDist);
+        }
+
+        else if (glm::length(pointLight.color) > 0.0f)
+        {
+            Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
+        }
+        else if (glm::length(directionalLight.color) > 0.0f)
+        {
+            Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
+        }
 
         // Generate Shadows
         bool inShadow = false;
