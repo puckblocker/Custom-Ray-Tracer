@@ -65,16 +65,16 @@ namespace Help
         float cosThetaIn = glm::dot(w0, hitInfo.normal);
 
         // REFLECTED
-        if (cosThetaOut > 0.0f && cosThetaIn > 0.0f)
-        {
-            return f;
-        }
+        // if (cosThetaOut > 0.0f && cosThetaIn > 0.0f)
+        // {
+        //     return f;
+        // }
 
         // REFLECTED
-        // if (wi.z > 0.0f && w0.z > 0.0f)
-        // {
-        //     return f; // return BxDF
-        // }
+        if (wi.z > 0.0f && w0.z > 0.0f)
+        {
+            return f; // return BxDF
+        }
 
         // TRANSMITTED
         glm::vec3 w; // current direction
@@ -85,12 +85,12 @@ namespace Help
         for (int depth = 0; depth < maxDepth; ++depth)
         {
             // Beer's Law Absorbance
-            // float distance = hitInfo.mat.z / glm::abs(w.z);
+            float distance = hitInfo.mat.z / glm::abs(w.z);
             float cosThetaW = glm::dot(w, hitInfo.normal);
-            float distance = hitInfo.mat.z / glm::max(glm::abs(cosThetaW), 0.001f);
+            // float distance = hitInfo.mat.z / glm::max(glm::abs(cosThetaW), 0.001f);
             f *= std::exp(-distance);
 
-            z = (z == hitInfo.mat.z) ? 0.0f : hitInfo.mat.z;
+            // z = (z == hitInfo.mat.z) ? 0.0f : hitInfo.mat.z;
 
             // Boundary Hit Check
             HitInfo crntHit = hitInfo;
