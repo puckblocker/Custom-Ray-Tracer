@@ -140,6 +140,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         {
             Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
         }
+
         else if (glm::length(directionalLight.color) > 0.0f)
         {
             Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
