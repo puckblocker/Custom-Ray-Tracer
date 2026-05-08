@@ -1,7 +1,10 @@
 #include "helper.h"
+#include "intersection.h"
 
 namespace Help
 {
+    std::vector<CIE_Table> cieTable;
+
     // Random Number Generator
     float RandFloat()
     {
@@ -21,10 +24,10 @@ namespace Help
     }
 
     // Fresnel Reflectance
-    glm::vec3 FrsRflct(glm::vec3 normal, glm::vec3 direction, glm::vec3 F0)
+    glm::vec4 FrsRflct(glm::vec3 normal, glm::vec3 direction, glm::vec4 F0)
     {
         float cosTheta = glm::clamp(glm::dot(normal, direction), 0.0f, 1.0f);
-        glm::vec3 Fr = F0 + (1.0f - F0) * glm::pow((1.0f - cosTheta), 5.0f);
+        glm::vec4 Fr = F0 + (1.0f - F0) * glm::pow((1.0f - cosTheta), 5.0f);
         return Fr;
     }
 
@@ -46,7 +49,7 @@ namespace Help
     }
 
     // LAYERED BSDF (Random Instead of Deterministic)
-    glm::vec3 LayeredBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
+    glm::vec4 LayeredBxDF(Ray ray, HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
         int maxDepth = 5;
 
@@ -58,7 +61,7 @@ namespace Help
         topLayer.mat.albedo = glm::vec3(1.0f);
 
         // BxDF CALL
-        glm::vec3 f = BxDF(topLayer, w0, wi, pdf); // initial check for if entered layer of not
+        glm::vec4 f = BxDF(ray, topLayer, w0, wi, pdf); // initial check for if entered layer of not
 
         // Outside Check
         float cosThetaOut = glm::dot(wi, hitInfo.normal);
@@ -108,7 +111,7 @@ namespace Help
 
             // Bounce
             float pdfBounce = 0.0f;
-            glm::vec3 color = BxDF(crntHit, -w, wi, pdfBounce);
+            glm::vec4 color = BxDF(ray, crntHit, -w, wi, pdfBounce);
             f *= color;
             pdf *= pdfBounce;
             w = wi;
@@ -122,16 +125,16 @@ namespace Help
             }
         }
 
-        return glm::vec3(0.0f);
+        return glm::vec4(0.0f);
     }
 
     // DIRECT LIGHTING BRDF
-    glm::vec3 DirectBxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi)
+    glm::vec4 DirectBxDF(Ray ray, HitInfo hitInfo, glm::vec3 w0, glm::vec3 wi)
     {
         // PERFECT SMOOTH CHECK (Dirac Delta)
         if (hitInfo.mat.roughness == 0.0f)
         {
-            return glm::vec3(0.0f);
+            return glm::vec4(0.0f);
         }
 
         // VARIABLES
@@ -144,10 +147,10 @@ namespace Help
 
         // IDEAL SPECULAR
         // Fresnel Schlick Approx (Calculate Reflection Based On Incident Angle)
-        glm::vec3 F0 = glm::vec3(0.04f);
+        glm::vec4 F0 = glm::vec4(0.04f);
         if (hitInfo.mat.metallic)
         {
-            F0 = glm::mix(F0, hitInfo.mat.albedo, hitInfo.mat.metallic); // mix the fresnel reflection with the base color based on how metallic object is
+            F0 = glm::mix(F0, ray.radiance, hitInfo.mat.metallic); // mix the fresnel reflection with the base color based on how metallic object is
         }
 
         // ROUGH SPECULAR (Direction Diffuse)
@@ -160,30 +163,30 @@ namespace Help
         float G = GeomFunc(k, hitInfo.normal, w0, wi);     // how much masking, shadowing, interreflection due to facet distribution
 
         // Rough Specular BRDF
-        glm::vec3 Fr = FrsRflct(wh, w0, F0);
-        glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotW0 * nDotWi);
+        glm::vec4 Fr = FrsRflct(wh, w0, F0);
+        glm::vec4 roughSpec = (D * G * Fr) / (4.0f * nDotW0 * nDotWi);
 
         // Ideal Diffuse
-        glm::vec3 kD = glm::vec3(1.0f) - Fr;
+        glm::vec4 kD = glm::vec4(1.0f) - Fr;
         kD *= (1.0f - hitInfo.mat.metallic);
-        glm::vec3 idealDiffuse = (kD * hitInfo.mat.albedo) / pi;
+        glm::vec4 idealDiffuse = (kD * ray.radiance) / pi;
         // glm::vec3 idealDiffuse = hitInfo.mat.albedo / pi;
 
         // PBR BRDF RESULT (Direct Lighting)
-        glm::vec3 directLighting = idealDiffuse + roughSpec;
+        glm::vec4 directLighting = idealDiffuse + roughSpec;
 
         return directLighting;
     }
 
-    glm::vec3 BxDF(HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
+    glm::vec4 BxDF(Ray ray, HitInfo hitInfo, glm::vec3 w0, glm::vec3 &wi, float &pdf)
     {
         // Variables
         float ior = hitInfo.mat.ior;
         glm::vec3 normal = hitInfo.normal;
-        glm::vec3 albedo = hitInfo.mat.albedo;
+        glm::vec4 albedo = ray.radiance;
         float nDotw0 = dot(hitInfo.normal, w0);
-        glm::vec3 Fr;
-        glm::vec3 F0 = glm::vec3(0.04f);
+        glm::vec4 Fr;
+        glm::vec4 F0 = glm::vec4(0.04f);
 
         // SMOOTH SPECULAR
         if (hitInfo.mat.roughness == 0.0f && (ior > 1.0f || hitInfo.mat.metallic))
@@ -198,7 +201,7 @@ namespace Help
                 float cosTheta;
 
                 // CORRECTED SCHLICK APPROXIMATION
-                F0 = glm::vec3(glm::pow((ior - 1) / (ior + 1), 2.0f));
+                F0 = glm::vec4(glm::pow((ior - 1) / (ior + 1), 2.0f));
 
                 // Variables
                 Fr = FrsRflct(n, w0, F0);
@@ -212,7 +215,7 @@ namespace Help
                     wi = glm::reflect(-w0, n);
                     pdf = 1.0f;
                     cosTheta = glm::max(glm::abs(glm::dot(n, wi)), 0.001f);
-                    return glm::vec3(1.0f);
+                    return glm::vec4(1.0f);
                 }
                 // Perfect Specular Transmission
                 else
@@ -227,7 +230,7 @@ namespace Help
 
                     pdf = 1.0f;
                     cosTheta = glm::max(glm::abs(glm::dot(n, wi)), 0.001f);
-                    return glm::vec3(1.0f);
+                    return glm::vec4(1.0f);
                 }
             }
             // Smooth Conductor
@@ -338,7 +341,7 @@ namespace Help
                 // Normal Check
                 if (glm::dot(wi, hitInfo.normal) <= 0.0f)
                 {
-                    return glm::vec3(0.0f);
+                    return glm::vec4(0.0f);
                 }
 
                 float k = (alphaSqr + 1.0f) / 8.0f;
@@ -355,8 +358,8 @@ namespace Help
                 pdf = glm::max(pdf, 0.001f);
 
                 // BRDF Calculations
-                glm::vec3 Fr = FrsRflct(wh, w0, F0);
-                glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
+                glm::vec4 Fr = FrsRflct(wh, w0, F0);
+                glm::vec4 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
 
                 return roughSpec;
             }
@@ -365,7 +368,7 @@ namespace Help
             else if (hitInfo.mat.ior > 1.0f)
             {
                 // CORRECTED SCHLICK APPROXIMATION
-                F0 = glm::vec3(glm::pow((ior - 1.0f) / (ior + 1.0f), 2.0f));
+                F0 = glm::vec4(glm::pow((ior - 1.0f) / (ior + 1.0f), 2.0f));
 
                 // Random Numbers
                 float xiPhi = RandFloat();
@@ -410,7 +413,7 @@ namespace Help
                     wi = glm::reflect(-w0, wh);
 
                     if (glm::dot(wi, hitInfo.normal) <= 0.0f)
-                        return glm::vec3(0.0f);
+                        return glm::vec4(0.0f);
 
                     float k = (alphaSqr + 1.0f) / 8.0f;
                     float D_new = DistrFunc(alphaSqr, hitInfo.normal, wh);
@@ -426,7 +429,7 @@ namespace Help
                     pdf = glm::max(pdf, 0.001f);
 
                     // Return BRDF
-                    return (D_new * G_new * glm::vec3(Fr) * nDotwi) / (4.0f * nDotwi);
+                    return (D_new * G_new * glm::vec4(Fr) * nDotwi) / (4.0f * nDotwi);
                 }
                 // Transmit (Refract)
                 else
@@ -436,7 +439,7 @@ namespace Help
                     // TIR Check
                     if (glm::length(wi) == 0.0f)
                     {
-                        return glm::vec3(0.0f);
+                        return glm::vec4(0.0f);
                     }
 
                     float k = (alphaSqr + 1.0f) / 8.0f;
@@ -461,7 +464,7 @@ namespace Help
                     // BTDF
                     float btdf = (D_new * G_new * w0Dotwh * wiDotwh) / (nDotw0 * nDotwi * denom);
                     float nDotwiT = glm::abs(glm::dot(hitInfo.normal, wi));
-                    return glm::vec3(btdf) * (1.0f - Fr) * albedo;
+                    return glm::vec4(btdf) * (1.0f - Fr) * albedo;
                 }
             }
 
@@ -470,12 +473,12 @@ namespace Help
             {
                 float nDotwi = glm::max(dot(hitInfo.normal, wi), 0.001f);
                 float nDotw0 = glm::max(dot(hitInfo.normal, w0), 0.001f);
-                glm::vec3 Fr = FrsRflct(wh, w0, F0);
-                glm::vec3 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
+                glm::vec4 Fr = FrsRflct(wh, w0, F0);
+                glm::vec4 roughSpec = (D * G * Fr) / (4.0f * nDotw0 * nDotwi);
 
                 // Diffuse Lobe (Lambertian)
-                glm::vec3 kD = (1.0f - Fr) * (1.0f - hitInfo.mat.metallic); // diffuse ratio
-                glm::vec3 diffuse = (kD * albedo) / pi;
+                glm::vec4 kD = (1.0f - Fr) * (1.0f - hitInfo.mat.metallic); // diffuse ratio
+                glm::vec4 diffuse = (kD * albedo) / pi;
 
                 // PBR BRDF RESULT (Direct Lighting)
                 // return (roughSpec + diffuse) * pi;
@@ -484,6 +487,72 @@ namespace Help
         }
 
         // Error Detection
-        return glm::vec3(0.0f);
+        return glm::vec4(0.0f);
+    }
+
+    //
+    // RGB TO SPECTRAL
+    //
+
+    // HERO SAMPLING
+    glm::vec4 RandLambda()
+    {
+        glm::vec4 lambda;
+
+        // Random Number Generator Setup
+        thread_local std::random_device r;                     // generate seed with hardware entropy
+        thread_local std::mt19937 gen(r());                    // generate normal distribution
+        std::uniform_real_distribution<float> distr(0.0, 1.0); // number range
+
+        // Create Range For Light Spectrum
+        float specMin = 380.0;
+        float specMax = 780.0;
+        float range = specMax - specMin;
+
+        // Generate Hero Sample (Initial Random Number)
+        float hero = specMin + (distr(gen) * range);
+
+        // Grab Lambda Values Based On Hero
+        for (int i = 0; i < 4; i++)
+        {
+            float offset = i * (range / 4.0f);
+            float val = hero + offset;
+
+            // Check For Bounds
+            if (val > specMax)
+            {
+                val -= range; // warp back to start
+            }
+
+            lambda[i] = val;
+        }
+
+        return lambda;
+    }
+
+    // Generate Reflectance Curve (Grab Power / Radiance) TEMPORARY REPLACE WITH BETTER METHOD
+    float ReflectanceCurve(glm::vec3 rgbVal, float lambda)
+    {
+        // Return Color Field Based On Wavelength
+        if (lambda < 490.0f)
+            return rgbVal.b;
+        else if (lambda < 580.0f)
+            return rgbVal.g;
+        else
+            return rgbVal.r;
+    }
+
+    // CIE Weights
+    CIE_Table getWeights(float lambda)
+    {
+        // Clamp Lamda
+        if (lambda < 380.0f || lambda > 780.0f)
+        {
+            return {0.0f, 0.0f, 0.0f};
+        }
+
+        int index = static_cast<int>(lambda - 380.0f);
+
+        return cieTable[index];
     }
 }

@@ -26,6 +26,8 @@ target_link_libraries(ray_tracer OpenMP::OpenMP_CXX)
 # Copy Test File to Debug
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scene.txt 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/CIE_xyz.csv 
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 # Copy glfw.3 File to Build
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/glfw3.lib
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/build)

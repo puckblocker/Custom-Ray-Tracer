@@ -5,11 +5,17 @@
 using namespace Help;
 
 // Point Light (No Geometry To Hit)
-glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
+glm::vec4 Light::pointLight(pLight light, Ray ray, HitInfo hitInfo, glm::vec3 &wi, float &dist)
 {
     // PDF is 1
     // VARIABLES
     glm::vec3 point = hitInfo.point;
+
+    // Radiance
+    light.specLe.x = ReflectanceCurve(light.color, ray.lambda.x);
+    light.specLe.y = ReflectanceCurve(light.color, ray.lambda.y);
+    light.specLe.z = ReflectanceCurve(light.color, ray.lambda.z);
+    light.specLe.w = ReflectanceCurve(light.color, ray.lambda.w);
 
     // MOST IMPORTANT > radiance = radiant flux / area * angle // radiant flux = energy / time // irradiance = energy / time * area
     // power leaving surface = power surface emits + (incoming power - absorbed power)
@@ -23,25 +29,37 @@ glm::vec3 Light::pointLight(pLight light, HitInfo hitInfo, glm::vec3 &wi, float 
     wi = (light.origin - point) / dist;        // wi (incoming direction)
 
     // Irradiance
-    glm::vec3 Le = light.color * attentuation; // irradiance
+    glm::vec4 Le = light.specLe * attentuation; // irradiance
     return Le;
 }
 
 // Directional Light (Infinite)
-glm::vec3 Light::directionalLight(dLight light, HitInfo hitInfo, glm::vec3 &wi)
+glm::vec4 Light::directionalLight(dLight light, Ray ray, HitInfo hitInfo, glm::vec3 &wi)
 {
+    // Radiance
+    light.specLe.x = ReflectanceCurve(light.color, ray.lambda.x);
+    light.specLe.y = ReflectanceCurve(light.color, ray.lambda.y);
+    light.specLe.z = ReflectanceCurve(light.color, ray.lambda.z);
+    light.specLe.w = ReflectanceCurve(light.color, ray.lambda.w);
+
     // PDF is 1.0
     // Light Direction
     wi = glm::normalize(-light.direction);
 
     // Irradiance
-    glm::vec3 Le = light.color;
+    glm::vec4 Le = light.specLe;
     return Le;
 }
 
 // Area Light
-glm::vec3 Light::areaLight(aLight light, HitInfo hitInfo, glm::vec3 &wi, float &dist)
+glm::vec4 Light::areaLight(aLight light, Ray ray, HitInfo hitInfo, glm::vec3 &wi, float &dist)
 {
+    // Radiance
+    light.specLe.x = ReflectanceCurve(light.color, ray.lambda.x);
+    light.specLe.y = ReflectanceCurve(light.color, ray.lambda.y);
+    light.specLe.z = ReflectanceCurve(light.color, ray.lambda.z);
+    light.specLe.w = ReflectanceCurve(light.color, ray.lambda.w);
+
     // Random Values
     float X0 = RandFloat();
     float Xi = RandFloat();
@@ -55,7 +73,7 @@ glm::vec3 Light::areaLight(aLight light, HitInfo hitInfo, glm::vec3 &wi, float &
     wi = (randPoint - hitInfo.point) / dist;
 
     // Irradiance
-    glm::vec3 Le = light.color / (pi * A);
+    glm::vec4 Le = light.specLe / (pi * A);
 
     return Le;
 }

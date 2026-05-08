@@ -8,7 +8,6 @@
 #include "intersection.h"
 #include "lighting.h"
 #include "viewport.h"
-#include "helper.h"
 
 class Renderer
 {
@@ -28,6 +27,9 @@ public:
 
     // FUNCTION SIGNATURES
     void render(float *pixelBuffer, int resWidth, int resHeight, float &sampleCount);
-    glm::vec3 tracer(Ray ray, unsigned int depth);
+    glm::vec4 tracer(Ray ray, unsigned int depth);
+
+    // File Readers
+    void loadCIE(const std::string &filename);
     void loadScene(const std::string &filename);
 };

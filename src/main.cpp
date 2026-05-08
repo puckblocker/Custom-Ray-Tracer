@@ -37,6 +37,7 @@ int main()
     GLFWwindow *window; //  create window
     Renderer renderer;
     renderer.loadScene("scene.txt");
+    renderer.loadCIE("CIE_xyz.csv");
     const int resWidth = 640;
     const int resHeight = 640;
     // Create Pixel Buffer to Heap

@@ -1,7 +1,10 @@
 #include "intersection.h"
+#include "helper.h"
 #include <vector>
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+using namespace Help;
 
 namespace Intersect
 {

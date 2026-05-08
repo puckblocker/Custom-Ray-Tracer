@@ -4,26 +4,27 @@
 #include <vector>
 
 #include "rayData.h"
+#include "helper.h"
 
 // Info On Intersection
 struct HitInfo
 {
-    glm::vec3 point;
-    bool valid;
-    float distance;
-    unsigned int objID;
-    glm::vec3 normal; // normal to surface at intersect point
+    glm::vec3 point = glm::vec3(0.0f);
+    bool valid = false;
+    float distance = 0.0f;
+    unsigned int objID = 0;
+    glm::vec3 normal = glm::vec3(0.0f); // normal to surface at intersect point
 
     // Materials
     struct Material
     {
-        glm::vec3 albedo; // object's reflectance/color
-        float roughness;  // 0 = smooth // 1 = rough
-        float metallic;   // metallic / conductor
-        float ior;        // Index of Refraction (is object glass)
-        bool emissive;    // is object a light
-        float z;          // depth
-        float layerIOR;   // ior for layered
+        glm::vec3 albedo = glm::vec3(0.0f); // object's reflectance/color
+        float roughness = 0.0f;             // 0 = smooth // 1 = rough
+        float metallic = 0.0f;              // metallic / conductor
+        float ior = 1.0f;                   // Index of Refraction (is object glass)
+        bool emissive = false;              // is object a light
+        float z = 0.0f;                     // depth
+        float layerIOR = 1.0f;              // ior for layered
     };
 
     Material mat;

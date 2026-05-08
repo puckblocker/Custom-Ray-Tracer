@@ -23,32 +23,61 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, float &sa
             // ANTI-ALIASING (Multiple Rays)
             // Varaibles
             Ray ray;
+            ray.lambda = RandLambda(); // generate lambda
 
-            glm::vec3 color(0.0f);
+            glm::vec4 colorSpec(0.0f);
             int smpleAmnt = 4; // samples per pixel
             float average = (float)smpleAmnt / (smpleAmnt + sampleCount);
+            glm::vec4 crntLambda = RandLambda();
 
             // Generate Jittered Rays (Jitter Happens Inside Ray)
             for (int index = 0; index < smpleAmnt; index++)
             {
                 // Generate Ray
                 ray = camera.rayGeneration(i, j);
+                ray.lambda = crntLambda;
 
                 // Call Tracer
-                glm::vec3 sampleColor = tracer(ray, 0);
+                glm::vec4 sampleColorSpec = tracer(ray, 0);
 
                 // NaN Check
-                if (glm::any(glm::isnan(sampleColor)))
+                if (glm::any(glm::isnan(sampleColorSpec)))
                 {
                 }
                 else
                 {
-                    color += sampleColor;
+                    colorSpec += sampleColorSpec;
                 }
             }
 
             // Average Radiance Calculation (Monte Carlo)
-            color = color / float(smpleAmnt);
+            colorSpec = colorSpec / float(smpleAmnt);
+
+            glm::vec3 colorRGB;
+
+            // Convert From Spectral to CIE XYZ
+            float X = 0.0f;
+            float Y = 0.0f;
+            float Z = 0.0f;
+
+            for (int i = 0; i < 4; i++)
+            {
+                // Grab Weights
+                CIE_Table weights = getWeights(ray.lambda[i]);
+
+                X += colorSpec[i] * weights.x;
+                Y += colorSpec[i] * weights.y;
+                Z += colorSpec[i] * weights.z;
+            }
+
+            X *= 0.25f;
+            Y *= 0.25f;
+            Z *= 0.25f;
+
+            // Convert From CIE XYZ to sRGB (Values Gotten from https://momentsingraphics.de/SpectralRendering1Spectra.html)
+            colorRGB.r = (3.2406255 * X) - (1.5372080 * Y) - (0.4986286 * Z);
+            colorRGB.g = (-0.9689307 * X) + (1.8757561 * Y) + (0.0415175 * Z);
+            colorRGB.b = (0.0557101 * X) - (0.2040211 * Y) + (1.0569959 * Z);
 
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
 
@@ -56,26 +85,26 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, float &sa
             if (sampleCount > 0)
             {
                 // color = ((pixelBufferTemp[index] * sampleCount) + color) / (sampleCount + 1.0f);
-                pixelBuffer[index] = glm::mix(pixelBuffer[index], color.r, average);         // weighted red
-                pixelBuffer[index + 1] = glm::mix(pixelBuffer[index + 1], color.g, average); // weighted green
-                pixelBuffer[index + 2] = glm::mix(pixelBuffer[index + 2], color.b, average); // weighted blue
+                pixelBuffer[index] = glm::mix(pixelBuffer[index], colorRGB.r, average);         // weighted red
+                pixelBuffer[index + 1] = glm::mix(pixelBuffer[index + 1], colorRGB.g, average); // weighted green
+                pixelBuffer[index + 2] = glm::mix(pixelBuffer[index + 2], colorRGB.b, average); // weighted blue
             }
             else
             {
                 // Grab RGB Components
-                pixelBuffer[index] = color.x;     // grab red value
-                pixelBuffer[index + 1] = color.y; // grab green value
-                pixelBuffer[index + 2] = color.z; // grab blue value
+                pixelBuffer[index] = colorRGB.x;     // grab red value
+                pixelBuffer[index + 1] = colorRGB.y; // grab green value
+                pixelBuffer[index + 2] = colorRGB.z; // grab blue value
             }
         }
     }
 }
 
 // TRACER
-glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
+glm::vec4 Renderer::tracer(Ray ray, unsigned int depth)
 {
-    glm::vec3 color = glm::vec3(0.0f);
-    glm::vec3 specCoeff = glm::vec3(0.0f);
+    glm::vec4 color = glm::vec4(0.0f);
+    glm::vec4 specCoeff = glm::vec4(0.0f);
 
     // Check For Max Depth
     if (depth >= 5)
@@ -86,9 +115,10 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     hitInfo.valid = false;
     hitInfo.distance = 1000000.0f;
 
-    // Check For Sphere
     HitInfo tempHit;
     int i = 0;
+
+    // Check For Sphere
     for (i = 0; i < spheres.size(); i++)
     {
         tempHit = intersectSphere(ray, spheres[i], xForms);
@@ -118,6 +148,12 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         }
     }
 
+    // Radiance
+    ray.radiance.x = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.x);
+    ray.radiance.y = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.y);
+    ray.radiance.z = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.z);
+    ray.radiance.w = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.w);
+
     // Non Light Hit
     if (hitInfo.valid && hitInfo.mat.emissive == false)
     {
@@ -127,23 +163,23 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         float lightDist = 1.0f;
 
         // LIGHT SAMPLING & SHADOWS
-        glm::vec3 Le;
+        glm::vec4 Le;
         // Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
         // Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
 
         if (glm::length(areaLight.color) > 0.0f)
         {
-            Le = light.areaLight(areaLight, hitInfo, wiDirect, lightDist);
+            Le = light.areaLight(areaLight, ray, hitInfo, wiDirect, lightDist);
         }
 
         else if (glm::length(pointLight.color) > 0.0f)
         {
-            Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
+            Le = light.pointLight(pointLight, ray, hitInfo, wiDirect, lightDist);
         }
 
         else if (glm::length(directionalLight.color) > 0.0f)
         {
-            Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
+            Le = light.directionalLight(directionalLight, ray, hitInfo, wiDirect);
         }
 
         // Generate Shadows
@@ -151,6 +187,11 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         Ray shadowRay;
         shadowRay.origin = hitInfo.point + (hitInfo.normal * 0.01f); // offset to avoid self shadowing
         shadowRay.direction = wiDirect;
+        shadowRay.lambda = ray.lambda;
+        shadowRay.radiance.x = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.x);
+        shadowRay.radiance.y = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.y);
+        shadowRay.radiance.z = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.z);
+        shadowRay.radiance.w = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.w);
 
         // Shadow Block Check Sphere
         HitInfo shadowHit;
@@ -172,13 +213,13 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         // COLOR / REFLECTANCE (BRDF)
         glm::vec3 R = hitInfo.mat.albedo;
         glm::vec3 w0 = -ray.direction;
-        glm::vec3 directLight = glm::vec3(0.0f);
+        glm::vec4 directLight = glm::vec4(0.0f);
 
         // Not In Shadow
         if (!inShadow)
         {
             // DIRECT LIGHTING
-            glm::vec3 rflctDirect = DirectBxDF(hitInfo, w0, wiDirect);
+            glm::vec4 rflctDirect = DirectBxDF(ray, hitInfo, w0, wiDirect);
 
             float nDotWi = glm::dot(hitInfo.normal, wiDirect); // lambert's cos law
             directLight = rflctDirect * nDotWi * Le;
@@ -186,28 +227,33 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
 
         // INDIRECT LIGHT
         glm::vec3 wiIndirect;
-        glm::vec3 rflctIndirect;
+        glm::vec4 rflctIndirect;
 
         if (hitInfo.mat.z == 0.0f)
         {
-            rflctIndirect = BxDF(hitInfo, w0, wiIndirect, pdf);
+            rflctIndirect = BxDF(ray, hitInfo, w0, wiIndirect, pdf);
         }
         else
         {
-            rflctIndirect = LayeredBxDF(hitInfo, w0, wiIndirect, pdf);
+            rflctIndirect = LayeredBxDF(ray, hitInfo, w0, wiIndirect, pdf);
         }
 
         Ray bounceRay;
         bounceRay.direction = wiIndirect;
         glm::vec3 normOffset = glm::dot(wiIndirect, hitInfo.normal) < 0.0f ? -hitInfo.normal : hitInfo.normal; // prevent self intersection
         bounceRay.origin = hitInfo.point + (normOffset * 0.002f);
+        bounceRay.lambda = ray.lambda;
+        bounceRay.radiance.x = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.x);
+        bounceRay.radiance.y = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.y);
+        bounceRay.radiance.z = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.z);
+        bounceRay.radiance.w = ReflectanceCurve(hitInfo.mat.albedo, ray.lambda.w);
 
         // Indirect Light Calculation
-        glm::vec3 Li = tracer(bounceRay, depth + 1);
+        glm::vec4 Li = tracer(bounceRay, depth + 1);
 
         // color += (rflct * pi) * Li;
         float nDotwi = glm::abs(glm::dot(hitInfo.normal, wiIndirect)); // lambert's cos law
-        glm::vec3 indirectLight = (rflctIndirect * Li * nDotwi) / pdf;
+        glm::vec4 indirectLight = (rflctIndirect * Li * nDotwi) / pdf;
 
         // Final Color
         color += indirectLight + directLight;
@@ -218,7 +264,7 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
     else
     {
         // Set Sky Color
-        return glm::vec3(0.69f, 0.88f, 1.0f);
+        return glm::vec4(0.69f, 0.88f, 1.0f, 1.0f);
 
         // Add Emission From All Infinite Lights
         // return directionalLight.color;
@@ -368,5 +414,28 @@ void Renderer::loadScene(const std::string &filename)
             std::cout << glm::to_string(trnsfrm.transform) << "\n\n";
         }
     }
+    file.close();
+}
+
+// CIE LookUp TABLE
+void Renderer::loadCIE(const std::string &filename)
+{
+    std::ifstream file(filename);
+
+    // Check For File
+    if (!file.is_open())
+    {
+        std::cout << "Failed to Open CIE table: " << filename << std::endl;
+        return;
+    }
+
+    float lambda, x, y, z;
+    char comma; // temp value
+
+    while (file >> lambda >> comma >> x >> comma >> y >> comma >> z)
+    {
+        cieTable.push_back({x, y, z});
+    }
+
     file.close();
 }
