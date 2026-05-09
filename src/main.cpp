@@ -8,7 +8,16 @@
 #include "lighting.h"
 #include "renderer.h"
 
+#include <csignal>
+
+// Image Saving
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 using namespace std;
+
+// Forward Declarations
+void imageSaver(float *pixelBuffer, int width, int height);
 
 // VERTEX SHADER (Sets vertices)
 const char *vertexShaderSource = "#version 330 core\n"
@@ -128,10 +137,57 @@ int main()
     // Sample Count For Progressive
     float sampleCount = 0.0f;
 
+    int choice;
+    bool inMenu = true;
+
+    // Start Menu
+    cout << "\n===RENDERER===\n\n"
+         << "To Pause Hold ESCAPE\n\n";
+
     // OPEN WINDOW
     while (!glfwWindowShouldClose(window)) // keeps window up until closed by user
     {
-        glfwPollEvents();                    // keeps event queue from overflowing (events are constantly being made)
+        glfwPollEvents(); // keeps event queue from overflowing (events are constantly being made)
+
+        // Pause Handler
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            cout << "\n\n--Program Paused--\n";
+
+            // Pause Loop
+            while (inMenu)
+            {
+                cout << "1. Save Image\n"
+                     << "2. Continue\n"
+                     << "0. Terminate (CRTL+C If it fails\n";
+                cout << "What would you like to do?\n";
+
+                cin >> choice;
+
+                switch (choice)
+                {
+                case (0):
+                    glfwSetWindowShouldClose(window, true);
+                    inMenu = false;
+                    break;
+
+                case (1):
+                    imageSaver(pixelBuffer, resWidth, resHeight);
+                    break;
+
+                case (2):
+                    inMenu = false;
+                    break;
+
+                default:
+                    cout << "Invalid...\n";
+                    break;
+                }
+            }
+
+            inMenu = true;
+        }
+
         glClearColor(.75f, .5f, .75f, 1.0f); // set color that will be used to clear the screen
         glClear(GL_COLOR_BUFFER_BIT);        // clears screen with constant to tell which buffer to clear (color buffer)
 
@@ -160,4 +216,32 @@ int main()
     glDeleteProgram(shaderProgram);
     glfwTerminate(); // terminate window
     return 0;        // terminate program
+}
+
+// Save Image
+void imageSaver(float *pixelBuffer, int width, int height)
+{
+    cout << "\nSaving Image...\n";
+
+    // Image Buffer
+    unsigned char *byteData = new unsigned char[width * height * 3];
+
+    // Loop Through, Convert Float to Bytes
+    for (int i = 0; i < width * height * 3; i++)
+    {
+        float clamped = glm::clamp(pixelBuffer[i], 0.0f, 1.0f);
+        byteData[i] = static_cast<unsigned char>(clamped * 255.0f);
+    }
+
+    // Flip Image
+    stbi_flip_vertically_on_write(true);
+
+    stbi_write_png("Render.png", width, height, 3, byteData, width * 3);
+
+    cout << "\nImage Saved...\n";
+
+    // Clean up
+    delete[] byteData;
+
+    return;
 }
