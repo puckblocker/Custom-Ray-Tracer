@@ -164,8 +164,6 @@ glm::vec4 Renderer::tracer(Ray ray, unsigned int depth)
 
         // LIGHT SAMPLING & SHADOWS
         glm::vec4 Le;
-        // Le = light.pointLight(pointLight, hitInfo, wiDirect, lightDist);
-        // Le = light.directionalLight(directionalLight, hitInfo, wiDirect);
 
         if (glm::length(areaLight.color) > 0.0f)
         {
@@ -264,10 +262,16 @@ glm::vec4 Renderer::tracer(Ray ray, unsigned int depth)
     else
     {
         // Set Sky Color
-        return glm::vec4(0.69f, 0.88f, 1.0f, 1.0f);
+        glm::vec3 ambientColor = glm::vec3(0.69f, 0.88f, 1.0f);
+        glm::vec4 ambientColorSpec;
 
-        // Add Emission From All Infinite Lights
-        // return directionalLight.color;
+        // Radiance
+        ambientColorSpec.x = ReflectanceCurve(ambientColor, ray.lambda.x);
+        ambientColorSpec.y = ReflectanceCurve(ambientColor, ray.lambda.y);
+        ambientColorSpec.z = ReflectanceCurve(ambientColor, ray.lambda.z);
+        ambientColorSpec.w = ReflectanceCurve(ambientColor, ray.lambda.w);
+
+        return ambientColorSpec;
     }
 }
 

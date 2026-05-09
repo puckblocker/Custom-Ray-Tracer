@@ -530,7 +530,7 @@ namespace Help
         return lambda;
     }
 
-    // Generate Reflectance Curve (Grab Power / Radiance) TEMPORARY REPLACE WITH BETTER METHOD
+    // Spectral Unsampling (Generate Reflectance Curve (Grab Power / Radiance))
     float ReflectanceCurve(glm::vec3 rgbVal, float lambda)
     {
         // Return Color Field Based On Wavelength
@@ -545,12 +545,13 @@ namespace Help
     // CIE Weights
     CIE_Table getWeights(float lambda)
     {
-        // Clamp Lamda
+        // Clamp Lamda (Out of Bounds)
         if (lambda < 380.0f || lambda > 780.0f)
         {
             return {0.0f, 0.0f, 0.0f};
         }
 
+        // Convert To Integer
         int index = static_cast<int>(lambda - 380.0f);
 
         return cieTable[index];
