@@ -138,7 +138,7 @@ int main()
     float sampleCount = 0.0f;
 
     int choice;
-    bool inMenu = true;
+    bool inMenu = false;
 
     // Start Menu
     cout << "\n===RENDERER===\n\n"
@@ -153,13 +153,14 @@ int main()
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             cout << "\n\n--Program Paused--\n";
+            inMenu = true;
 
             // Pause Loop
             while (inMenu)
             {
                 cout << "1. Save Image\n"
                      << "2. Continue\n"
-                     << "0. Terminate (CRTL+C If it fails\n";
+                     << "0. Terminate\n";
                 cout << "What would you like to do?\n";
 
                 cin >> choice;
