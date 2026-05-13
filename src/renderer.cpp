@@ -209,8 +209,14 @@ glm::vec3 Renderer::tracer(Ray ray, unsigned int depth)
         float nDotwi = glm::abs(glm::dot(hitInfo.normal, wiIndirect)); // lambert's cos law
         glm::vec3 indirectLight = (rflctIndirect * Li * nDotwi) / pdf;
 
-        // Final Color
+        // COLOR CALCULATION
         color += indirectLight + directLight;
+
+        // Max Radiance Clamp (Firefly fix (GREEN))
+        float maxRad = 10.0f;
+        color.x = glm::min(color.x, maxRad);
+        color.y = glm::min(color.y, maxRad);
+        color.z = glm::min(color.z, maxRad);
 
         return color;
     }
