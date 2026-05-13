@@ -79,6 +79,8 @@ void Renderer::render(float *pixelBuffer, int resWidth, int resHeight, float &sa
             colorRGB.g = (-0.9689307 * X) + (1.8757561 * Y) + (0.0415175 * Z);
             colorRGB.b = (0.0557101 * X) - (0.2040211 * Y) + (1.0569959 * Z);
 
+            colorRGB = glm::max(colorRGB, glm::vec3(0.0f));
+
             int index = (j * resWidth + i) * 3; // multiply by 3 to account for RGB components and resWidth to prevent overwriting pixels
 
             // PROGRESSIVE RENDERER (Average Total Samples)
@@ -255,6 +257,13 @@ glm::vec4 Renderer::tracer(Ray ray, unsigned int depth)
 
         // Final Color
         color += indirectLight + directLight;
+
+        // Max Radiance
+        float maxRad = 10.0f;
+        color.x = glm::min(color.x, maxRad);
+        color.y = glm::min(color.y, maxRad);
+        color.z = glm::min(color.z, maxRad);
+        color.w = glm::min(color.w, maxRad);
 
         return color;
     }
