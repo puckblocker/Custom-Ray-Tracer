@@ -137,8 +137,14 @@ namespace Help
         // VARIABLES
         float pi = 3.14159265359;
 
-        float nDotW0 = glm::max(glm::dot(hitInfo.normal, w0), 0.001f);
-        float nDotWi = glm::max(glm::dot(hitInfo.normal, wi), 0.001f);
+        float nDotW0 = glm::dot(hitInfo.normal, w0);
+        float nDotWi = glm::dot(hitInfo.normal, wi);
+
+        // Early Exit
+        if (nDotW0 <= 0.0f || nDotWi <= 0.0f)
+        {
+            return glm::vec4(0.0f);
+        }
 
         glm::vec3 wh = glm::normalize(w0 + wi); // half-way vector
 
